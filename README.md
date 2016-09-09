@@ -104,6 +104,8 @@ Use following docker images.
 
 Notes:
 - Name conventions: `-full` means full version(no `--without-...`), while `-limited` means --without-snapshot --without-inspector --without-intl.
+- The full version maybe failed due nodejs has some wrong code commit, then use limited version, it's relative stable.
+  Otherwise, please switch to some version, run ./build.sh yourself.
 - To enter the container, run `docker run` command e.g. `docker run -it osexp2000/android-arm-full`
 - Build already done. The output are mainly stored at `~/usr/local/bin`(node) and `~/out`(cctest, openssl-cli...).
 - Built on latest source of nodejs *at that time*. Run `cd ~/node && git log -1 --oneline` to check source version.
@@ -333,6 +335,7 @@ android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 Notes:
 - 名称规范: `-full`表示完全版(没有使用`--without...`),而`-limited`表示--without-snapshot --without-inspector --without-intl.
+- full版可能因为docker image制作时恰好nodejs有个不好的commit而失败,那就用limited版吧,稳定。要么自己切换到某个版本后调用./build.sh.
 - 进入这个linux容器的话,执行`docker run`命令就行了。例如`docker run -it osexp2000/android-arm-full`
 - 可以在容器里运行`./build.sh`来自己编译, 未改变的源码由于被ccache了所以速度很快。
 - 编译已经完成了。生成物主要在`~/usr/local/bin`(node)和`~/out`(cctest, openssl-cli...).
