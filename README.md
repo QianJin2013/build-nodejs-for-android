@@ -10,33 +10,35 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 
 ## Development Environment
 
-**Source of [NodeJS](https://github.com/nodejs/node): 6.3.1-6.5.0**
-
-OS:
-- **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit)
-- **Linux**: Ubuntu 16.04 (64bit)
-- **Windows**: Windows Pro 7.
+- Mac OS X EI Capitan (10.11.5或10.11.6) (64bit)
+    - [NodeJS Source v6.3.1-6.5.0](https://github.com/nodejs/node)
+    - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip) (Dn&Unzip)
+    - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (Dn&Unzip)
+    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`)
+    - (Full Build only)Xcode 7.3.1(It installs gcc/g++ front) (manually install)
  
-    Use [Docker Images](#docker-images) via [Docker-Toolbox](https://www.docker.com/products/docker-toolbox).
+- Linux Ubuntu 16.04 (64bit)
+    - [NodeJS Source v6.3.1-6.5.0](https://github.com/nodejs/node)
+    - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip) (Dn&Unzip)
+    - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (Dn&Unzip)
+    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`)
+    - (Full Build only)gcc/g++5.4 (`sudo apt-get install gcc g++ gcc-multilib g++-multilib`)
 
-NDK: 
- - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
- - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- Windows: 7 Pro.
+    - [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
+    - Run `docker run osexp2000/android-gcc-toolchain` to enter Linux environment. See [here](https://github.com/sjitech/android-gcc-toolchain#user-content-docker)
 
-Auxiliary tool:
-- [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
+- *Mac/Linux Common Settings*
 
-CCACHE(optional):
-- **To speed up repeating compilation, you'd better add `--ccache` option for `android-gcc-toolchain`**
-
-    First you need install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:
+    - For CCACHE: (**To speed up repeating compilation, please use CCACHE**)
     
-    ```
-    export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-    export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-    ccache -M 50G                   #set cache size once is ok
-    ```
-    
+        ```
+        export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
+        export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
+        ```
+        
+        Then run `ccache -M 50G` once to set cache size.
+
 ----
 
 ## Limited build
@@ -55,10 +57,12 @@ For x64: `--openssl-no-asm` needed due to openssl assembly optimization not read
 
 ## Full build
 
-Using `android-gcc-toolchain --hack ... -C`, you can build nodejs **with all features** easily.
+- Using `android-gcc-toolchain --hack ... -C`, you can build nodejs **with all features**.
 
-see [About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-it's not terrible as sound, it just supersede compiler commands in $PATH and add/remove some option.
+    see [About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
+    it's not terrible as sound, it just supersede compiler commands in $PATH and add/remove some option.
+
+- If failed to build, please use Limited Build instead, or remove some unstable experimental features(add `--without-inspector`...).
 
 ### Full build on Mac
 
@@ -110,7 +114,7 @@ Notes:
 - Build already done. The output are mainly stored at `~/usr/local/bin`(node) and `~/out`(cctest, openssl-cli...).
 - Built on latest source of nodejs *at that time*. Run `cd ~/node && git log -1 --oneline` to check source version.
 - The source of NodeJS is at `~/node`, you can use git there or `~/git-pull.sh`, `~/git-clean.sh`.
-- You can run `./build.sh` in the container to build yourself, it is fast for unchanged files because of ccache.
+- You can run `./build.sh` in the container to build yourself, it is fast for unchanged files because of CCACHE.
 - These docker images share common base image so the download size will be reduced from second image. 
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
@@ -122,7 +126,7 @@ Notes:
 
 ----
 
-## Run compiled nodejs-android on android
+## Run NodeJS on Android
 
 Successfully tested on real device or emulator 
 - nodejs-android-arm-full
@@ -132,7 +136,7 @@ Successfully tested on real device or emulator
 
 Some experiences:
 
-### Install build result into android
+### Install
 
 ```
 $ make DESTDIR=/tmp/nodejs install
@@ -141,21 +145,22 @@ $ adb push /tmp/nodejs/usr/local/lib /data/local/tmp/
 $ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
-### Run nodejs
+### Run
 
-Just run /data/local/tmp/node, be need first set `export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
-otherwise `Error: Could not open history file. REPL session history will not be persisted.`.
+- First set `export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
+  otherwise `Error: Could not open history file. REPL session history will not be persisted.`.
 
-### Run npm
+- To run NodeJS itself, just run `/data/local/tmp/node` 
 
-Use following script as npm, then you can use `npm install`, `-g` also allowed.
-```
-export HOME=/data/local/tmp
-export NODE_REPL_HISTORY=$HOME/node_history
-mkdir $HOME/npm-global 2> /dev/null
-export NPM_CONFIG_PREFIX=$HOME/npm-global
-$HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
-```
+- To run npm(NodeJS Package Manager), use following script as npm, then you can use `npm install`, `-g` also allowed.
+
+    ```
+    export HOME=/data/local/tmp
+    export NODE_REPL_HISTORY=$HOME/node_history
+    mkdir $HOME/npm-global 2> /dev/null
+    export NPM_CONFIG_PREFIX=$HOME/npm-global
+    $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
+    ```
 
 ----
 
@@ -240,36 +245,42 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 
 碰巧都想出了通用的方法,虽然方法有点黑,但是管用,可以完美编译了,于是记录下来。
 
+----
+
 ## 开发环境
 
-源码:
-- [NodeJS](https://github.com/nodejs/node): v6.3.1-6.5.0
+- Mac OS X EI Capitan (10.11.5或10.11.6) (64bit)
+    - [NodeJS源码v6.3.1-6.5.0](https://github.com/nodejs/node)
+    - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip) (下载解压即可)
+    - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (下载解压即可)
+    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`)
+    - (只有要编译完美版时才需要)Xcode 7.3.1(他会自动安装gcc/g++前端) (手动安装)
+ 
+- Linux Ubuntu 16.04 (64bit)
+    - [NodeJS源码v6.3.1-6.5.0](https://github.com/nodejs/node)
+    - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip) (下载解压即可)
+    - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (下载解压即可)
+    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`)
+    - (只有要编译完美版时才需要)gcc/g++5.4 (`sudo apt-get install gcc g++ gcc-multilib g++-multilib`)
 
-编译工作机器:
-- Mac OS X EI Capitan (10.11.5或10.11.6) (64bit) ([NDK 12.1.29](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip))
-- Linux Ubuntu 16.04 (64bit) ([NDK 12.1.29](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip))
-- Windows: Pro 7 + 用[Docker-Toolbox](https://www.docker.com/products/docker-toolbox)。
-    工具`android-gcc-toolchain`是不支持Windows的,所以得在Docker的Linux容器里运行。
+- Windows: 7 Pro.
+    - [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
+    - 通过`docker run osexp2000/android-gcc-toolchain`进入Linux环境。见[这里](https://github.com/sjitech/android-gcc-toolchain#user-content-docker)
 
-NDK: 
- - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
- - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- *Mac/Linux共同的设定*
 
-辅助工具 tool:
-- [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
-
-CCACHE(可选)
-- **为了快速地重复编译,建议给`android-gcc-toolchain`加上`--ccache`选项**,这个会把通过`ccache`的wrapper来调用原来的gcc等命令。
-
-    先安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:
+    - 为CCACHE: (**为了快速地重复编译,请使用CCACHE**)
     
-    ```
-    export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-    export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-    ccache -M 50G                   #set cache size once is ok
-    ```
+        ```
+        export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
+        export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
+        ```
+        
+        然后运行一次`ccache -M 50G`来设定cache大小。
 
-## Limited Build
+----
+
+## Limited Build (限制版)
 
 去掉NodeJS的一些功能(指定--without-snapshot --without-inspector --without-intl)就可以在Mac/Linux上编译。
 
@@ -283,12 +294,16 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
     
 对于x64: 需要加上`--openssl-no-asm`,因为openssl的汇编优化配置里都没有支持android-x64.
 
-## Full Build
+<a name="full-build"></a>
 
-用`android-gcc-toolchain --hack ... -C`可以编译nodejs,包含**所有机能**.
+## Full Build (完全版，完美版)
 
-参看[About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-不是想象的那么可怕,只不过是在$PATH里超越本机编译器命令然后加减一点选项罢了。
+- 用`android-gcc-toolchain --hack ... -C`可以编译nodejs,包含**所有机能**.
+
+    参看[About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
+    不是想象的那么可怕,只不过是在$PATH里超越本机编译器命令然后加减一点选项罢了。
+
+- 如果编译失败了，那就用相对稳定的Limited Build吧。要不就去掉一些实验功能(加上`--without-inspector`....)
 
 ### Full Build on Mac
 
@@ -337,7 +352,7 @@ Notes:
 - 名称规范: `-full`表示完全版(没有使用`--without...`),而`-limited`表示--without-snapshot --without-inspector --without-intl.
 - full版可能因为docker image制作时恰好nodejs有个不好的commit而失败,那就用limited版吧,稳定。要么自己切换到某个版本后调用./build.sh.
 - 进入这个linux容器的话,执行`docker run`命令就行了。例如`docker run -it osexp2000/android-arm-full`
-- 可以在容器里运行`./build.sh`来自己编译, 未改变的源码由于被ccache了所以速度很快。
+- 可以在容器里运行`./build.sh`来自己编译, 未改变的源码由于被CCACHE了所以速度很快。
 - 编译已经完成了。生成物主要在`~/usr/local/bin`(node)和`~/out`(cctest, openssl-cli...).
 - 使用了当时看来最新的NoeJS源码. 查看版本可以用命令`cd ~/node && git log -1 --oneline`。
 - NodeJS源码`~/node`是可以用git管理的,也可以用`~/git-pull.sh`, `~/git-clean.sh`.
@@ -352,7 +367,7 @@ Notes:
 
 ----
 
-## 在Android运行编译出来的nodejs-android
+## 在Android里运行NodeJS
 
 在实机和模拟器里测试成功: 
 - nodejs-android-arm-full
@@ -360,9 +375,7 @@ Notes:
 - nodejs-android-arm64-full
 - nodejs-android-arm64-limited. 
 
-一些经验:
-
-### 把编译结果安装到Android里
+### 安装
 
 ```
 make DESTDIR=/tmp/nodejs install
@@ -371,21 +384,21 @@ adb push /tmp/nodejs/usr/local/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
-### 运行nodejs
+### 运行
 
-运行/data/local/tmp/node就行了。但是之前得先`export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
-不然会得到`Error: Could not open history file. REPL session history will not be persisted.`.
+- 先设定`export NODE_REPL_HISTORY=/data/local/tmp/node_history`。不然以后会得到`Error: Could not open history file. REPL session history will not be persisted.`.
 
-### 运行npm
+- 运行NodeJS本身的话，就运行`/data/local/tmp/node`就行了。
 
-用这个script代替npm, 然后就可以用`npm install`, `-g`也行.
-```
-export HOME=/data/local/tmp
-export NODE_REPL_HISTORY=$HOME/node_history
-mkdir $HOME/npm-global 2> /dev/null
-export NPM_CONFIG_PREFIX=$HOME/npm-global
-$HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
-```
+- 运行npm(NodeJS Package Manager)的话，得用这个script代替npm, 然后就可以用`npm install`, `-g`也行.
+
+    ```
+    export HOME=/data/local/tmp
+    export NODE_REPL_HISTORY=$HOME/node_history
+    mkdir $HOME/npm-global 2> /dev/null
+    export NPM_CONFIG_PREFIX=$HOME/npm-global
+    $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
+    ```
 
 ###具体的测试内容
 
@@ -775,7 +788,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     当然,到底在那个配置文件里加这个选项,有得头痛的层层追寻配置,不想干了。还不如黑路子快,
     最终,把这一切集成到android-gcc-toolchain里,通过`--hack gcc-lpthread`选项可以实现。
 
-- 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。
+- 2016/09/05: 支持CCACHE这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,两个c。
 
 - 2016/09/06: 编译android-mipsel版时,碰到bits/c++config.h找不到之类的错误。似乎以前碰到过查了一下搞好了,可又忘了。得做个memo。
 
