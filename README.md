@@ -14,14 +14,14 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
     - [NodeJS Source v6.3.1-6.5.0](https://github.com/nodejs/node)
     - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip) (Dn&Unzip)
     - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (Dn&Unzip)
-    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`)
+    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`), to speed up repeating compilation
     - (Full Build only)Xcode 7.3.1(It installs gcc/g++ front) (manually install)
  
 - Linux Ubuntu 16.04 (64bit)
     - [NodeJS Source v6.3.1-6.5.0](https://github.com/nodejs/node)
     - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip) (Dn&Unzip)
     - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (Dn&Unzip)
-    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`)
+    - (Optional)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`), to speed up repeating compilation
     - (Full Build only)gcc/g++5.4 (`sudo apt-get install gcc g++ gcc-multilib g++-multilib`)
 
 - Windows: 7 Pro.
@@ -30,14 +30,9 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 
 - *Mac/Linux Common Settings*
 
-    - For CCACHE: (**To speed up repeating compilation, please use CCACHE**)
-    
-        ```
-        export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-        export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-        ```
-        
-        Then run `ccache -M 50G` once to set cache size.
+    - For CCACHE: `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
+        `export CCACHE_DIR=some_dir`(default is ~/.ccache), you'd better put these setting into your ~/.bash_profile etc.
+        Then run `ccache -M 50G` once to set max cache size(default is 5G).
 
 ----
 
@@ -253,14 +248,14 @@ $ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
     - [NodeJS源码v6.3.1-6.5.0](https://github.com/nodejs/node)
     - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip) (下载解压即可)
     - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (下载解压即可)
-    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`)
+    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`brew install ccache`)，快速重复编译用的
     - (只有要编译完美版时才需要)Xcode 7.3.1(他会自动安装gcc/g++前端) (手动安装)
  
 - Linux Ubuntu 16.04 (64bit)
     - [NodeJS源码v6.3.1-6.5.0](https://github.com/nodejs/node)
     - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip) (下载解压即可)
     - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain) (下载解压即可)
-    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`)
+    - (可选)[CCACHE](https://ccache.samba.org/manual.html) (`sudo apt-get install ccache`)，快速重复编译用的
     - (只有要编译完美版时才需要)gcc/g++5.4 (`sudo apt-get install gcc g++ gcc-multilib g++-multilib`)
 
 - Windows: 7 Pro.
@@ -269,14 +264,9 @@ $ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 
 - *Mac/Linux共同的设定*
 
-    - 为CCACHE: (**为了快速地重复编译,请使用CCACHE**)
-    
-        ```
-        export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-        export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-        ```
-        
-        然后运行一次`ccache -M 50G`来设定cache大小。
+    - 为CCACHE:`export USE_CCACHE=1`告诉android-gcc-toolchain使用CCACHE(否则就得每次指定--ccache选项)。
+        `export CCACHE_DIR=某目录`(默认是~/.ccache)。最好把这些设定存到~/.bash_profile什么的。
+        然后运行一次`ccache -M 50G`来设定最大cache大小(默认是是5G)。
 
 ----
 
