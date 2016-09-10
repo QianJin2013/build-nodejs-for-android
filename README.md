@@ -30,9 +30,9 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 
 - *Mac/Linux Common Settings*
 
-    - For CCACHE: `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
-        `export CCACHE_DIR=some_dir`(default is ~/.ccache), you'd better put these setting into your ~/.bash_profile etc.
-        Then run `ccache -M 50G` once to set max cache size(default is 5G).
+    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
+    - `export CCACHE_DIR=some_dir`(default is ~/.ccache).
+    - run `ccache -M 50G` once to set max cache size(default is 5G).
 
 ----
 
@@ -264,9 +264,9 @@ $ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 
 - *Mac/Linux共同的设定*
 
-    - 为CCACHE:`export USE_CCACHE=1`告诉android-gcc-toolchain使用CCACHE(否则就得每次指定--ccache选项)。
-        `export CCACHE_DIR=某目录`(默认是~/.ccache)。最好把这些设定存到~/.bash_profile什么的。
-        然后运行一次`ccache -M 50G`来设定最大cache大小(默认是是5G)。
+    - `export USE_CCACHE=1`告诉android-gcc-toolchain使用CCACHE(否则就得每次指定--ccache选项)。
+    - `export CCACHE_DIR=某目录`(默认是~/.ccache)。
+    - 运行一次`ccache -M 50G`来设定最大cache大小(默认是是5G)。
 
 ----
 
