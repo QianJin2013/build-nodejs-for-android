@@ -52,32 +52,32 @@ For x64: `--openssl-no-asm` needed due to openssl assembly optimization not read
 
 ## Full build
 
-- Using `android-gcc-toolchain --hack ... -C`, you can build nodejs **with all features**.
+- Using `android-gcc-toolchain --host ... -C`, you can build nodejs **with all features**.
 
-    see [About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-    it's not terrible as sound, it just supersede compiler commands in $PATH and add/remove some option.
+    see [Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-option), 
+    it supersede compiler commands in $PATH and add/remove some option.
 
 - If failed to build, please use Limited Build instead, or remove some unstable experimental features(add `--without-inspector`...).
 
 ### Full build on Mac
 
 ```
-android-gcc-toolchain arm    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
-android-gcc-toolchain x64    --hack ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 The sed command is to modify a bug of `configure`. 
  
 ### Full build on Linux
  
 ```
-android-gcc-toolchain arm    --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
-android-gcc-toolchain x64    --hack gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
+android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 For x86:You must install 32bit lib by `sudo apt-get install -y g++-multilib gcc-multilib`,otherwise complained about sys/cdefs.h etc. not found.
@@ -181,7 +181,7 @@ $ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
     you still need iconv-lite etc.
     
     NodeJS use [icu](http://site.icu-project.org/) project to implement `Intl` feature 
-    while `icu` often cause problem in cross-compile because it need build host-side exe such as genccode,icupkg 
+    while `icu` often cause problem in cross-compile because it need build host exe such as genccode,icupkg 
     then run them to generate temp C source.
     
     The icu project looks ugly, see [Home page](http://site.icu-project.org/),
@@ -288,21 +288,21 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 
 ## Full Build (完全版，完美版)
 
-- 用`android-gcc-toolchain --hack ... -C`可以编译nodejs,包含**所有机能**.
+- 用`android-gcc-toolchain --host ... -C`可以编译nodejs,包含**所有机能**.
 
-    参看[About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-    不是想象的那么可怕,只不过是在$PATH里超越本机编译器命令然后加减一点选项罢了。
+    参看[Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-option), 
+    就是通过$PATH里超越本机编译器命令然后加减一点选项。
 
 - 如果编译失败了，那就用相对稳定的Limited Build吧。要不就去掉一些实验功能(加上`--without-inspector`....)
 
 ### Full Build on Mac
 
 ```
-android-gcc-toolchain arm    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
-android-gcc-toolchain x64    --hack ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 sed命令是修改源码里configure脚本里的错误.
@@ -310,11 +310,11 @@ sed命令是修改源码里configure脚本里的错误.
 ### Full Build on Linux
 
 ```
-android-gcc-toolchain arm    --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
-android-gcc-toolchain x64    --hack gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
+android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 对于x86:必须先安装一些32bit的lib:`sudo apt-get install -y g++-multilib gcc-multilib`,否则它报错说sys/cdefs.h找不到。
@@ -701,7 +701,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
         symbols:         [  ]
     ...
     ```
-    2016/09/06:这个方法后来换成了gcc-no-lrt这个hack option,超越系统原有的gcc等命令,把-lrt参数给去掉后在调用原本的gcc等。
+    2016/09/06:这个方法后来换成了gcc-no-lrt了,超越系统原有的gcc等命令,把-lrt参数给去掉后在调用原本的gcc等。
     
 - 静态库生成器ar误用
 
@@ -764,7 +764,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     反正是有的编译成32bit,有的是64bit。
     不好查找。所以烦了,还是继续原来的野路子吧,把gcc和g++都给替换了,里面强制加上-m32选项。
     
-    最终,这一切集成到android-gcc-toolchain里,通过`--hack ar-dual-os,gcc-no-lrt,gcc-m32`选项可以实现。
+    最终,这一切集成到android-gcc-toolchain里,通过`--host ar-dual-os,gcc-no-lrt,gcc-m32`选项可以实现。
 
 - 2016/09/02: 在Linux上编译NodeJS for Android-arm64时碰到的错误和解决方法
 
@@ -776,7 +776,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     说符号找不到还有DSO什么莫名其妙的东西,我用nm查了发现符号就在libpthread里,所以加个-lpthread让他连接libpthread就行了。
     
     当然,到底在那个配置文件里加这个选项,有得头痛的层层追寻配置,不想干了。还不如黑路子快,
-    最终,把这一切集成到android-gcc-toolchain里,通过`--hack gcc-lpthread`选项可以实现。
+    最终,把这一切集成到android-gcc-toolchain里,通过`--host gcc-lpthread`选项可以实现。
 
 - 2016/09/05: 支持CCACHE这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,两个c。
 
