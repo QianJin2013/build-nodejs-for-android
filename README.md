@@ -106,27 +106,14 @@ Use following docker images.
 
 ## Docker images
 
-- [osexp2000/build-nodejs-android-arm-full](https://github.com/sjitech/build-nodejs-android-arm-full)
-- [osexp2000/build-nodejs-android-arm-limited](https://github.com/sjitech/build-nodejs-android-arm-limited)
-- [osexp2000/build-nodejs-android-arm64-full](https://github.com/sjitech/build-nodejs-android-arm64-full)
-- [osexp2000/build-nodejs-android-arm64-limited](https://github.com/sjitech/build-nodejs-android-arm64-limited)
-- [osexp2000/build-nodejs-android-mipsel-full](https://github.com/sjitech/build-nodejs-android-mipsel-full)
-- [osexp2000/build-nodejs-android-mipsel-limited](https://github.com/sjitech/build-nodejs-android-mipsel-limited)
-- [osexp2000/build-nodejs-android-x64-full](https://github.com/sjitech/build-nodejs-android-x64-full)
-- [osexp2000/build-nodejs-android-x64-limited](https://github.com/sjitech/build-nodejs-android-x64-limited)
-- [osexp2000/build-nodejs-android-x86-full](https://github.com/sjitech/build-nodejs-android-x86-full)
-- [osexp2000/build-nodejs-android-x86-limited](https://github.com/sjitech/build-nodejs-android-x86-limited)
-
-**I am prepare a single docker image with all output of all arch of v6.5.0**
+**osexp2000/nodejs-android contains all output of all arch of v6.5.0**
 
 Notes:
-- Name conventions: `-full` means full version(no `--without-...`), while `-limited` means --without-snapshot --without-inspector --without-intl.
-- To enter the container, run `docker run` command e.g. `docker run -it osexp2000/android-arm-full`
-- Build already done. The output are mainly stored at `~/usr/local/bin`(node) and `~/out`(cctest, openssl-cli...).
-- Built on latest source of nodejs *at that time*. Run `cd ~/node && git log -1 --oneline` to check source version.
-- The source of NodeJS is at `~/node`, you can use git there or `~/git-pull.sh`, `~/git-clean.sh`.
-- You can run `./build.sh` in the container to build yourself, it is fast for unchanged files because of ccache.
-- These docker images share common base image so the download size will be reduced from second image. 
+- To enter the container, run `docker run -it osexp2000/nodejs-android`
+- Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
+- Build already done. The output are mainly stored at `nodejs-6.5.0-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
+- Built on NodeJs v6.5.0, at `~/node`, you can use git there.
+- You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
     - Use volume mapping `-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE` to map dir/files to container. 
@@ -140,20 +127,20 @@ Notes:
 ## Run compiled nodejs-android on android
 
 Successfully tested on real device or emulator 
-- nodejs-android-arm-full
-- nodejs-android-arm-limited
-- nodejs-android-arm64-full
-- nodejs-android-arm64-limited. 
+- nodejs-6.5.0-android-arm-full
+- nodejs-6.5.0-android-arm
+- nodejs-6.5.0-android-arm64-full
+- nodejs-6.5.0-android-arm64 
 
 Some experiences:
 
 ### Install build result into android
 
+With nodejs-6.5.0-arm as example:
 ```
-$ make DESTDIR=/tmp/nodejs install
-$ adb push /tmp/nodejs/usr/local/bin/node /data/local/tmp/
-$ adb push /tmp/nodejs/usr/local/lib /data/local/tmp/
-$ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
+adb push /home/devuser/nodejs-6.5.0-arm/bin/node /data/local/tmp/
+adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
+adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
 ### Run nodejs
@@ -354,27 +341,14 @@ android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 ## Docker images
 
-- [osexp2000/build-nodejs-android-arm-full](https://github.com/sjitech/build-nodejs-android-arm-full)
-- [osexp2000/build-nodejs-android-arm-limited](https://github.com/sjitech/build-nodejs-android-arm-limited)
-- [osexp2000/build-nodejs-android-arm64-full](https://github.com/sjitech/build-nodejs-android-arm64-full)
-- [osexp2000/build-nodejs-android-arm64-limited](https://github.com/sjitech/build-nodejs-android-arm64-limited)
-- [osexp2000/build-nodejs-android-mipsel-full](https://github.com/sjitech/build-nodejs-android-mipsel-full)
-- [osexp2000/build-nodejs-android-mipsel-limited](https://github.com/sjitech/build-nodejs-android-mipsel-limited)
-- [osexp2000/build-nodejs-android-x64-full](https://github.com/sjitech/build-nodejs-android-x64-full)
-- [osexp2000/build-nodejs-android-x64-limited](https://github.com/sjitech/build-nodejs-android-x64-limited)
-- [osexp2000/build-nodejs-android-x86-full](https://github.com/sjitech/build-nodejs-android-x86-full)
-- [osexp2000/build-nodejs-android-x86-limited](https://github.com/sjitech/build-nodejs-android-x86-limited)
-
-**正在做成一个单一的Docker imag，囊括6.5.0的所有构架的编译结果**
+**osexp2000/nodejs-android，囊括了6.5.0的所有构架的编译结果**
 
 Notes:
-- 名称规范: `-full`表示完全版(没有使用`--without...`),而`-limited`表示--without-snapshot --without-inspector --without-intl.
-- 进入这个linux容器的话,执行`docker run`命令就行了。例如`docker run -it osexp2000/android-arm-full`
-- 可以在容器里运行`./build.sh`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 编译已经完成了。生成物主要在`~/usr/local/bin`(node)和`~/out`(cctest, openssl-cli...).
-- 使用了当时看来最新的NoeJS源码. 查看版本可以用命令`cd ~/node && git log -1 --oneline`。
-- NodeJS源码`~/node`是可以用git管理的,也可以用`~/git-pull.sh`, `~/git-clean.sh`.
-- 这些image共享一些基本的image,所以下载数据量会从第二个开始减少。 
+- 进入这个linux容器的话,执行`docker run -it osexp2000/nodejs-android`
+- 里面有nodejs-6.5.0-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
+- 编译已经完成了。生成物主要在`nodejs-6.5.0-*`的bin,lib,include和extras(cctest, openssl-cli...).
+- 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
+- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的
 - Docker快速入门:
     - 这个docker run里的`-it`表示 `--interactive --tty`.
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
@@ -388,19 +362,19 @@ Notes:
 ## 在Android运行编译出来的nodejs-android
 
 在实机和模拟器里测试成功: 
-- nodejs-android-arm-full
-- nodejs-android-arm-limited
-- nodejs-android-arm64-full
-- nodejs-android-arm64-limited. 
+- nodejs-6.5.0-android-arm-full
+- nodejs-6.5.0-android-arm
+- nodejs-6.5.0-android-arm64-full
+- nodejs-6.5.0-android-arm64 
 
 一些经验:
 
 ### 把编译结果安装到Android里
 
+以nodejs-6.5.0-arm为例
 ```
-make DESTDIR=/tmp/nodejs install
-adb push /tmp/nodejs/usr/local/bin/node /data/local/tmp/
-adb push /tmp/nodejs/usr/local/lib /data/local/tmp/
+adb push /home/devuser/nodejs-6.5.0-arm/bin/node /data/local/tmp/
+adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
