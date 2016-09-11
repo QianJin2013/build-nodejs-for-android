@@ -1,0 +1,175 @@
+#!/bin/bash
+function _msg { echo "$@" >&2; }
+function _dbg { [[ $NODEJS_BUILD_DBG == 1 ]] && echo "$@" >&2; }
+
+VERSION=1.0
+
+[[ $# == 0 ]] && exec "$0" --help
+
+IN=""; OUT=""; PRE_CLEAN=""; POST_CLEAN=""; ARCH=""; APIL=""; STL=""; VERBOSE=""; FULL=""; FORCE="";
+
+while [[ $# -gt 0 ]]; do
+    _dbg "\"$1\""
+    case $1 in
+    --arch) case $2 in arm|arm64|x86|x64|mipsel) ARCH=$2; _dbg " ARCH=\"$2\""; shift;;
+            ""|-*) _msg "expect arch behind $1. Must be arm(default)|arm64|x86|x64|mipsel"; exit 1;;
+            *) _msg "invalid arch \"$2\". Must be arm(default)|arm64|x86|x64|mipsel"; exit 1;;
+            esac
+            ;;
+    --api)  case $2 in min|max) APIL=$2; _dbg " APIL=\"$2\""; shift;;
+            ""|-*) _msg "expect Android API level behind $1. Must be min(default)|max|an integer"; exit 1;;
+            *[!0-9]*) _msg "invalid Android API level \"$2\". Must be min(default)|max|an integer"; exit 1;;
+            *) APIL=$2; _dbg " APIL=\"$2\""; shift;;
+            esac
+            ;;
+    --stl)  case $2 in gnustl|libc++|stlport) STL=$2; _dbg " STL=\"$2\""; shift;;
+            ""|-*) _msg "expect C++ STL behind $1. Must be gnustl(default)|libc++|stlport"; exit 1;;
+            *) _msg "invalid C++ STL \"$2\". Must be gnustl(default)|libc++|stlport"; exit 1;;
+            esac
+            ;;
+    -o|--out)  case $2 in
+            ""|-*) _msg "expect output dir behind $1"; exit 1;;
+            *) OUT=$2; _dbg " OUT=\"$2\""; shift;;
+            esac
+            ;;
+    --pre-clean)
+            PRE_CLEAN=$1; _dbg " ->PRE_CLEAN"
+            ;;
+    --post-clean)
+            POST_CLEAN=$1; _dbg " ->POST_CLEAN"
+            ;;
+    --full)
+            FULL=$1; _dbg " ->FULL"
+            ;;
+    --force)
+            FORCE=$1; _dbg " ->FORCE"
+            ;;
+    -v|--verbose)
+            VERBOSE=--verbose; _dbg " ->VERBOSE"
+            ;;
+    --help*|--version)
+            break
+            ;;
+    --*)
+            _msg "invalid long option \"$1\". Must be --out|--full|--force|--pre-clean|--post-clean|--arch|--api|--stl|--version|--help"
+            exit 1
+            ;;
+    -*)
+            _msg "invalid short option \"$1\". Must be -o(out)"
+            exit 1
+            ;;
+    "")
+            _dbg " :skip isolated empty arg"
+            ;;
+    *)
+            IN=$1; _dbg " ->IN"
+            ;;
+    esac
+
+    shift
+done
+
+case $1 in
+--help)
+    _msg "${0##*/} $VERSION"
+    _msg "Enable you build nodejs easily."
+    _msg ""
+    _msg "Usage: ${0##*/} [OPTIONS] <SourceDir>"
+    _msg "--------------------------------------------------------------------------------"
+    _msg "OPTIONS:"
+    _msg " -o DIR, --out DIR"
+    _msg "                Output dir. By default is <SourceDir>-out"
+    _msg " --force        Enable overwrite output dir if already exists"
+    _msg " --full"
+    _msg "                Full build, not specify any --without-... option to NodeJS,"
+    _msg "                otherwise --without-snapshot --without-inspector --without-intl"
+    _msg ""
+    _msg " --pre-clean    Clean before build"
+    _msg " --post-clean   Clean on build success"
+    _msg ""
+    _msg " --arch   ARCH  Android architecture:"
+    _msg "                {arm(default)|arm64|x86|x64|mipsel}"
+    _msg " --api    APIL  Android API level:"
+    _msg "                {min(default)|max|an integer}"
+    _msg " --stl    STL   C++ STL to use:"
+    _msg "                {gnustl(default)|libc++|stlport}"
+    _msg ""
+    _msg " --version      Show version of this tool"
+    exit 0
+    ;;
+--version)
+    _msg $VERSION
+    exit 0
+    ;;
+esac
+
+[[ ! $IN ]] && { _msg "expect source dir as argument"; exit 1; }
+[[ ! -d $IN ]] && { _msg "invalid source dir \"$IN\""; exit 1; }
+
+[[ ! $OUT ]] && { OUT=`cd $IN && pwd`-out || exit 1; }
+if [[ ! -d $OUT ]]; then
+    mkdir -pv "$OUT" || exit 1
+else
+    [[ ! $FORCE ]] && { _msg "auto chosen output dir already exists: \"$OUT\". To enable overwrite it, use --force"; exit 1; }
+fi
+OUT=`cd "$OUT" && pwd` || exit 1
+
+[[ ! $ARCH ]] && ARCH=arm
+[[ ! $APIL ]] && APIL=min
+[[ ! $STL ]] && STL=gnustl
+
+cd "$IN" || exit 1
+
+_msg "source dir: \"$PWD\"";
+_msg "output dir: \"$OUT\"";
+
+
+[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && git clean -fdx; rm -fr out node; }
+
+if [[ $FULL ]]; then
+#set gyp host_os to explicitly set it so correctly choose source files
+    case $OSTYPE in
+    darwin*)
+        case $ARCH in
+        arm    ) android-gcc-toolchain arm    $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make" ;;
+        arm64  ) android-gcc-toolchain arm64  $APIL $STL --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make" ;;
+        x86    ) android-gcc-toolchain x86    $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make" ;;
+        x64    ) android-gcc-toolchain x64    $APIL $STL --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make" ;;
+        mipsel ) android-gcc-toolchain mipsel $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make" ;;
+        esac;;
+    linux*)
+        case $ARCH in
+        arm    ) android-gcc-toolchain arm    $APIL $STL --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make" ;;
+        arm64  ) android-gcc-toolchain arm64  $APIL $STL --host gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make" ;;
+        x86    ) android-gcc-toolchain x86    $APIL $STL --host gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make" ;;
+        x64    ) android-gcc-toolchain x64    $APIL $STL --host gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make" ;;
+        mipsel ) android-gcc-toolchain mipsel $APIL $STL --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make" ;;
+        esac;;
+    *) _msg "unsupported host OS $OSTYPE. Please use Mac or Linux"; exit 1 ;;
+    esac
+else
+    case $ARCH in
+    arm    ) android-gcc-toolchain arm    $APIL $STL <<< "./configure --dest-cpu=arm    --dest-os=android --without-snapshot --without-inspector --without-intl && make" ;;
+    arm64  ) android-gcc-toolchain arm64  $APIL $STL <<< "./configure --dest-cpu=arm64  --dest-os=android --without-snapshot --without-inspector --without-intl && make" ;;
+    x86    ) android-gcc-toolchain x86    $APIL $STL <<< "./configure --dest-cpu=x86    --dest-os=android --without-snapshot --without-inspector --without-intl && make" ;;
+    x64    ) android-gcc-toolchain x64    $APIL $STL <<< "./configure --dest-cpu=x64    --dest-os=android --without-snapshot --without-inspector --without-intl --openssl-no-asm && make" ;;
+    mipsel ) android-gcc-toolchain mipsel $APIL $STL <<< "./configure --dest-cpu=mipsel --dest-os=android --without-snapshot --without-inspector --without-intl && make" ;;
+    esac
+fi
+
+[[ $? != 0 ]] && exit 1
+
+rm -fr "$OUT/"*
+
+#copy build result to $OUT/{bin,lib,include}
+make DESTDIR="$OUT" PREFIX="" install | grep -vE '^installing|^symlinking|^removing'
+[[ ${PIPESTATUS[0]} != 0 ]] && { _msg "failed to run make install"; exit 1; }
+
+mkdir "$OUT/extras" && \
+for f in out/Release/*; do
+    [[ -x $f && ${f##*/} != node ]] && ln -f "$f" "$OUT/extras"
+done
+
+ls -lF "$OUT/bin/"* "$OUT/extras/"*
+
+[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && git clean -fdx; rm -fr out node; }
