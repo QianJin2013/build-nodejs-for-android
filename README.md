@@ -574,8 +574,6 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     
     不但要生成Android的,还要本机用的一些关联的东西,这就是混合模式了。
 
-    似乎`android-configure`加了个`--openssl-no-asm`选项的原因就是为了避免这个错误。
-    
     在往一点看,icupkg是由这个命令生成的:
     ```
     /tmp/tc/bin/aarch64-linux-android-g++ ... -o ...icupkg .../obj.host/...icu...
