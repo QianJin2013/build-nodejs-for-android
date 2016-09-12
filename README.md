@@ -205,7 +205,7 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
      
     >让人快捷地使用NDK的独立toolchain做交叉编译,并且有些奇妙的功能。
     
-- 编译好了的二进制文件(arm,arm64,x86,x64,mipsel构架)可以从[这里](https://github.com/sjitech/nodejs-android-prebuilt-binaries)直接下载。 
+- [编译好了的二进制文件(arm,arm64,x86,x64,mipsel构架)](https://github.com/sjitech/nodejs-android-prebuilt-binaries)可以直接下载。 
 
 - 一个编译环境用的Docker image `osexp2000/build-nodejs-for-android`可以用来按自己的需求编译.
     见 [Docker Images](#docker-images).
