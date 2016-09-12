@@ -6,7 +6,7 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
     See [Full Build](#full-build). This tool
     > Enable you to use NDK's standalone toolchain easily, quickly and **magically** for cross-compile.
 
-- Prebuilt binaries of nodejs for android-{arm,arm64,x86,x64,mipsel} can be download from [here](https://github.com/sjitech/nodejs-android-prebuilt-binaries) 
+- [Prebuilt binaries of nodejs for android-{arm,arm64,x86,x64,mipsel}](https://github.com/sjitech/nodejs-android-prebuilt-binaries) are available. 
 
 - A build environment as a docker image `osexp2000/build-nodejs-for-android` can be used to build on your needs.
     See [Docker Images](#docker-images). 
