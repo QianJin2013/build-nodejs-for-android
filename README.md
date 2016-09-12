@@ -109,7 +109,7 @@ Use following docker images.
 
 ## Docker images
 
-**osexp2000/build-nodejs-for-android contains a fast build environment, and prebuilt binaries of NodeJS v6.5.0**
+**The docker image `osexp2000/build-nodejs-for-android` contains a fast build environment, and prebuilt binaries of NodeJS v6.5.0**
 
 Notes:
 - To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
@@ -347,7 +347,7 @@ android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 ## Docker images
 
-**osexp2000/build-nodejs-for-android 包含了一个便于编译的环境，还有NodeJS 6.5.0版的预编译结果**
+**Docker image `osexp2000/build-nodejs-for-android`包含了一个便于编译的环境，还有NodeJS 6.5.0版的预编译结果**
 
 Notes:
 - 进入这个linux容器的话,执行`docker run -it osexp2000/build-nodejs-for-android`
