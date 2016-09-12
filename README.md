@@ -6,7 +6,10 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
     See [Full Build](#full-build). This tool
     > Enable you to use NDK's standalone toolchain easily, quickly and **magically** for cross-compile.
 
-- Prebuilt nodejs-android-{arm,arm64,x86,x64,mipsel} are available from [Docker Images](#docker-images). 
+- Prebuilt binaries of nodejs for android-{arm,arm64,x86,x64,mipsel} can be download from [here](https://github.com/sjitech/nodejs-android-prebuilt-binaries) 
+
+- A build environment as a docker image `osexp2000/build-nodejs-for-android` can be used to build on your needs.
+    See [Docker Images](#docker-images). 
 
 ## Development Environment
 
@@ -70,30 +73,30 @@ For x64: `--openssl-no-asm` needed due to openssl not ready for android-x64.
 
 ## Full build
 
-Using `android-gcc-toolchain --hack ... -C`, you can build nodejs **with all features** easily.
+Using `android-gcc-toolchain --host ... -C`, you can build nodejs **with all features** easily.
 
-see [About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-it's not terrible as sound, it just supersede compiler commands in $PATH and add/remove some option.
+The `--host ...` means [Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
+it supersede compiler commands in $PATH and add/remove some option.
 
 ### Full build on Mac
 
 ```
-android-gcc-toolchain arm    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
-android-gcc-toolchain x64    --hack ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 The sed command is to modify a bug of `configure`. 
  
 ### Full build on Linux
  
 ```
-android-gcc-toolchain arm    --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
-android-gcc-toolchain x64    --hack gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
+android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 For x86:You must install 32bit lib by `sudo apt-get install -y g++-multilib gcc-multilib`,otherwise complained about sys/cdefs.h etc. not found.
@@ -106,13 +109,13 @@ Use following docker images.
 
 ## Docker images
 
-**osexp2000/nodejs-android contains all output of all arch of v6.5.0**
+**osexp2000/build-nodejs-for-android contains a fast build environment, and prebuilt binaries of NodeJS v6.5.0**
 
 Notes:
-- To enter the container, run `docker run -it osexp2000/nodejs-android`
+- To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
 - Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
 - Build already done. The output are mainly stored at `nodejs-6.5.0-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
-- Built on NodeJs v6.5.0, at `~/node`, you can use git there.
+- Built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git checkout v6.4.0` or `git checkout master` for latest source.
 - You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
@@ -124,7 +127,7 @@ Notes:
 
 ----
 
-## Run compiled nodejs-android on android
+## Run NodeJS on Android
 
 Successfully tested on real device or emulator 
 - nodejs-6.5.0-android-arm-full
@@ -134,7 +137,7 @@ Successfully tested on real device or emulator
 
 Some experiences:
 
-### Install build result into android
+### Install into Android
 
 With nodejs-6.5.0-arm as example:
 ```
@@ -143,12 +146,12 @@ adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
-### Run nodejs
+### Run NodeJS
 
 Just run /data/local/tmp/node, be need first set `export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 otherwise `Error: Could not open history file. REPL session history will not be persisted.`.
 
-### Run npm
+### Run npm(NodeJS Package Manager)
 
 Use following script as npm, then you can use `npm install`, `-g` also allowed.
 ```
@@ -167,7 +170,7 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 
     It is to not convert js to C/C++ on compile time. Seems no problem if specified.
     If not specified, it will try to make a tool `mksnapshot` then run this tool to convert js to `snapshot.cc`
-    which in turn get compiled by android-side compiler. The snapshot seems used for quick js context creation. 
+    which in turn get compiled by android compiler. The snapshot seems used for quick js context creation. 
 
 - What on earth is the --without-intl?
 
@@ -183,7 +186,7 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
     you still need iconv-lite etc.
     
     NodeJS use [icu](http://site.icu-project.org/) project to implement `Intl` feature 
-    while `icu` often cause problem in cross-compile because it need build host-side exe such as genccode,icupkg 
+    while `icu` often cause problem in cross-compile because it need build host exe such as genccode,icupkg 
     then run them to generate temp C source.
     
     The icu project looks ugly, see [Home page](http://site.icu-project.org/),
@@ -202,8 +205,11 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
      
     >让人快捷地使用NDK的独立toolchain做交叉编译,并且有些奇妙的功能。
     
-- 预编译好的Docker Images在[这里](#docker-images)
+- 编译好了的二进制文件(arm,arm64,x86,x64,mipsel构架)可以从[这里](https://github.com/sjitech/nodejs-android-prebuilt-binaries)直接下载。 
 
+- 一个编译环境用的Docker image `osexp2000/build-nodejs-for-android`可以用来按自己的需求编译.
+    见 [Docker Images](#docker-images).
+     
 ## 由头
 
 交叉编译,是个不大不小的土活儿,很无聊,很干扰正题。
@@ -304,19 +310,19 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 
 ## Full Build
 
-用`android-gcc-toolchain --hack ... -C`可以编译nodejs,包含**所有机能**.
+用`android-gcc-toolchain --host ... -C`可以编译nodejs,包含**所有机能**.
 
-参看[About hack mode](https://github.com/sjitech/android-gcc-toolchain#user-content-about-hack-mode), 
-不是想象的那么可怕,只不过是在$PATH里超越本机编译器命令然后加减一点选项罢了。
+这个`--host ...`是[Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
+是在$PATH里超越本机编译器命令然后加减一点选项。
 
 ### Full Build on Mac
 
 ```
-android-gcc-toolchain arm    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
-android-gcc-toolchain x64    --hack ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 sed命令是修改源码里configure脚本里的错误.
@@ -324,11 +330,11 @@ sed命令是修改源码里configure脚本里的错误.
 ### Full Build on Linux
 
 ```
-android-gcc-toolchain arm    --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
-android-gcc-toolchain arm64  --hack gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --hack gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
-android-gcc-toolchain x64    --hack gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
-android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
+android-gcc-toolchain arm    --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
+android-gcc-toolchain arm64  --host gcc-lpthread         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
+android-gcc-toolchain x86    --host gcc-lpthread,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
+android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
+android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
 对于x86:必须先安装一些32bit的lib:`sudo apt-get install -y g++-multilib gcc-multilib`,否则它报错说sys/cdefs.h找不到。
@@ -341,14 +347,14 @@ android-gcc-toolchain mipsel --hack gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 ## Docker images
 
-**osexp2000/nodejs-android，囊括了6.5.0的所有构架的编译结果**
+**osexp2000/build-nodejs-for-android 包含了一个便于编译的环境，还有NodeJS 6.5.0版的预编译结果**
 
 Notes:
-- 进入这个linux容器的话,执行`docker run -it osexp2000/nodejs-android`
+- 进入这个linux容器的话,执行`docker run -it osexp2000/build-nodejs-for-android`
 - 里面有nodejs-6.5.0-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
 - 编译已经完成了。生成物主要在`nodejs-6.5.0-*`的bin,lib,include和extras(cctest, openssl-cli...).
 - 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的
+- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git checkout v6.4.0`或者`git checkout master`取最新源码.
 - Docker快速入门:
     - 这个docker run里的`-it`表示 `--interactive --tty`.
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
@@ -359,7 +365,7 @@ Notes:
 
 ----
 
-## 在Android运行编译出来的nodejs-android
+## 在Android运行NodeJS
 
 在实机和模拟器里测试成功: 
 - nodejs-6.5.0-android-arm-full
@@ -369,7 +375,7 @@ Notes:
 
 一些经验:
 
-### 把编译结果安装到Android里
+### 安装到Android里
 
 以nodejs-6.5.0-arm为例
 ```
@@ -378,12 +384,12 @@ adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
 
-### 运行nodejs
+### 运行NodeJS
 
 运行/data/local/tmp/node就行了。但是之前得先`export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 不然会得到`Error: Could not open history file. REPL session history will not be persisted.`.
 
-### 运行npm
+### 运行npm(NodeJS Package Manager)
 
 用这个script代替npm, 然后就可以用`npm install`, `-g`也行.
 ```
@@ -577,7 +583,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     这是发神经了吗? 拿android-g++编译obj.host的东西,可icupkg是要在host(也就是我的PC)上执行的啊,
     为什么用android-g++编译呢。
     
-    发现在决定host-side的编译器时,用的逻辑在[make.py](https://github.com/nodejs/node/blob/master/tools/gyp/pylib/gyp/generator/make.py#L2068):
+    发现在决定host编译器时,用的逻辑在[make.py](https://github.com/nodejs/node/blob/master/tools/gyp/pylib/gyp/generator/make.py#L2068):
     ```
     GetEnvironFallback(('CXX_host', 'CXX'), 'g++')
     ```
@@ -707,7 +713,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
         symbols:         [  ]
     ...
     ```
-    2016/09/06:这个方法后来换成了gcc-no-lrt这个hack option,超越系统原有的gcc等命令,把-lrt参数给去掉后在调用原本的gcc等。
+    2016/09/06:这个方法后来换成了gcc-no-lrt这个host compiler rule,超越系统原有的gcc等命令,把-lrt参数给去掉后在调用原本的gcc等。
     
 - 静态库生成器ar误用
 
@@ -770,7 +776,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     反正是有的编译成32bit,有的是64bit。
     不好查找。所以烦了,还是继续原来的野路子吧,把gcc和g++都给替换了,里面强制加上-m32选项。
     
-    最终,这一切集成到android-gcc-toolchain里,通过`--hack ar-dual-os,gcc-no-lrt,gcc-m32`选项可以实现。
+    最终,这一切集成到android-gcc-toolchain里,通过`--host ar-dual-os,gcc-no-lrt,gcc-m32`选项可以实现。
 
 - 2016/09/02: 在Linux上编译NodeJS for Android-arm64时碰到的错误和解决方法
 
@@ -782,7 +788,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     说符号找不到还有DSO什么莫名其妙的东西,我用nm查了发现符号就在libpthread里,所以加个-lpthread让他连接libpthread就行了。
     
     当然,到底在那个配置文件里加这个选项,有得头痛的层层追寻配置,不想干了。还不如黑路子快,
-    最终,把这一切集成到android-gcc-toolchain里,通过`--hack gcc-lpthread`选项可以实现。
+    最终,把这一切集成到android-gcc-toolchain里,通过`--host gcc-lpthread`选项可以实现。
 
 - 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。
 
