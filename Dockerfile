@@ -26,3 +26,6 @@ RUN build-nodejs-for-android . --arch x64    -o ../nodejs-6.5.0-android-x64     
 RUN build-nodejs-for-android . --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean --full  2>&1 | tee ../logs/nodejs-6.5.0-android-x64-full
 RUN build-nodejs-for-android . --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean         2>&1 | tee ../logs/nodejs-6.5.0-android-mipsel
 RUN build-nodejs-for-android . --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean --full  2>&1 | tee ../logs/nodejs-6.5.0-android-mipsel-full
+
+WORKDIR /home/devuser
+CMD ["/bin/bash", "-l"]
