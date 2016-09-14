@@ -167,7 +167,7 @@ make DESTDIR="$OUT" PREFIX="" install | grep -vE '^installing|^symlinking|^remov
 
 mkdir "$OUT/extras" && \
 for f in out/Release/*; do
-    [[ -x $f && ${f##*/} != node ]] && ln -f "$f" "$OUT/extras"
+    [[ -f $f && -x $f && ${f##*/} != node ]] && ln -f "$f" "$OUT/extras"
 done
 
 ls -lF "$OUT/bin/"* "$OUT/extras/"*
