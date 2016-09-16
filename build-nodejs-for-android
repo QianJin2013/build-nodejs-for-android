@@ -2,7 +2,7 @@
 function _msg { echo "$@" >&2; }
 function _dbg { [[ $NODEJS_BUILD_DBG == 1 ]] && echo "$@" >&2; }
 
-VERSION=1.1
+VERSION=1.2
 
 [[ $# == 0 ]] && exec "$0" --help
 
@@ -85,7 +85,10 @@ case $1 in
     _msg "                otherwise --without-snapshot --without-inspector --without-intl"
     _msg ""
     _msg " --pre-clean    Clean before build"
-    _msg " --post-clean   Clean on build success"
+    _msg "                The cleaning is done by first try call (make clean),"
+    _msg "                then (git clean -fdx && git reset --hard as possible)"
+    _msg "                then (rm -fr out) as final resort"
+    _msg " --post-clean   Clean on build success. The cleaning is same as --pre-clean"
     _msg ""
     _msg " --arch   ARCH  Android architecture:"
     _msg "                {arm(default)|arm64|x86|x64|mipsel}"
@@ -124,7 +127,7 @@ _msg "source dir: \"$PWD\"";
 _msg "output dir: \"$OUT\"";
 
 
-[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && git clean -fdx; rm -fr out node; }
+[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
 
 if [[ $FULL ]]; then
 #set gyp host_os to explicitly set it so correctly choose source files
@@ -172,4 +175,4 @@ done
 
 ls -lF "$OUT/bin/"* "$OUT/extras/"*
 
-[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && git clean -fdx; rm -fr out node; }
+[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
