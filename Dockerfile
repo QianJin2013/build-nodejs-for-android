@@ -9,4 +9,5 @@ RUN git clone https://github.com/nodejs/node
 RUN git clone https://github.com/sjitech/build-nodejs-for-android -b master --single-branch
 ENV PATH=$PATH:/home/devuser/build-nodejs-for-android
 
+RUN build-nodejs-for-android-v 6.5.0
 RUN build-nodejs-for-android-v 6.6.0
