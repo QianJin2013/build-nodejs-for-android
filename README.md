@@ -115,7 +115,7 @@ Notes:
 - To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
 - Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
 - Build already done. The output are mainly stored at `nodejs-6.5.0-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
-- Built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git checkout v6.4.0` or `git checkout master` for latest source.
+- Built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
 - You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
@@ -354,7 +354,7 @@ Notes:
 - 里面有nodejs-6.5.0-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
 - 编译已经完成了。生成物主要在`nodejs-6.5.0-*`的bin,lib,include和extras(cctest, openssl-cli...).
 - 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git checkout v6.4.0`或者`git checkout master`取最新源码.
+- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
 - Docker快速入门:
     - 这个docker run里的`-it`表示 `--interactive --tty`.
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
