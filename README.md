@@ -13,18 +13,16 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 
 ## Development Environment
 
-**Source of [NodeJS](https://github.com/nodejs/node): 6.3.1-6.5.0**
+**Source of [NodeJS](https://github.com/nodejs/node): 6.3.1-6.6.0**
 
 OS:
-- **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit)
-- **Linux**: Ubuntu 16.04 (64bit)
-- **Windows**: Windows Pro 7.
- 
-    Use [Docker Images](#docker-images) via [Docker-Toolbox](https://www.docker.com/products/docker-toolbox).
+- **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit), (Optional)Xcode 8.0(8A218a)
+- **Linux**: Ubuntu 16.04 (64bit), (Optional)gcc/g++ 5.4.0
+- **Windows**: Windows Pro 7. [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
 
 NDK: 
- - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
- - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+ - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
+   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
 
 Auxiliary tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
@@ -78,6 +76,8 @@ Using `android-gcc-toolchain --host ... -C`, you can build nodejs **with all fea
 The `--host ...` means [Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
 it supersede compiler commands in $PATH and add/remove some option.
 
+*Full build will use host compiler to produce host binaries, so need install Xcode(for Mac) or gcc/g++(for linux)* 
+
 ### Full build on Mac
 
 ```
@@ -115,7 +115,7 @@ Notes:
 - To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
 - Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
 - Build already done. The output are mainly stored at `nodejs-6.5.0-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
-- Built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
+- Initially built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
 - You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
@@ -254,14 +254,13 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 - [NodeJS](https://github.com/nodejs/node): v6.3.1-6.5.0
 
 编译工作机器:
-- Mac OS X EI Capitan (10.11.5或10.11.6) (64bit) ([NDK 12.1.29](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip))
-- Linux Ubuntu 16.04 (64bit) ([NDK 12.1.29](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip))
-- Windows: Pro 7 + 用[Docker-Toolbox](https://www.docker.com/products/docker-toolbox)。
-    工具`android-gcc-toolchain`是不支持Windows的,所以得在Docker的Linux容器里运行。
+- **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit), (可选)Xcode 8.0(8A218a)
+- **Linux**: Ubuntu 16.04 (64bit), (可选)gcc/g++ 5.4.0
+- **Windows**: Windows Pro 7. [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
 
 NDK: 
- - [NDK 12.1.29 For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip)
- - [NDK 12.1.29 For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+ - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
+   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
 
 辅助工具 tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
@@ -315,6 +314,8 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 这个`--host ...`是[Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
 是在$PATH里超越本机编译器命令然后加减一点选项。
 
+*Full build需要用host(本机)的编译器生成运行于本机的执行文件，所以需要安装Xcode(for Mac)或者gcc/g++(for linux)* 
+
 ### Full Build on Mac
 
 ```
@@ -354,7 +355,7 @@ Notes:
 - 里面有nodejs-6.5.0-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
 - 编译已经完成了。生成物主要在`nodejs-6.5.0-*`的bin,lib,include和extras(cctest, openssl-cli...).
 - 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
+- 最开始是使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
 - Docker快速入门:
     - 这个docker run里的`-it`表示 `--interactive --tty`.
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
