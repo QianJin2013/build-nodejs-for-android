@@ -155,7 +155,7 @@ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 Just run /data/local/tmp/node, be need first set `export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 otherwise `Error: Could not open history file. REPL session history will not be persisted.`.
 
-If it's built with libc++ instead of default gnustl, then you need copy the `libc++_shared.so` from NDK to android `/data/local/tmp/`,
+If it's built with libc++ instead of default gnustl(libstdc++), then you need copy the `libc++_shared.so` from NDK to android `/data/local/tmp/`,
 then set `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/local/tmp`.
 
 The `libc++_shared.so` is located at: 
@@ -406,7 +406,7 @@ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 运行/data/local/tmp/node就行了。但是之前得先`export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 不然会得到`Error: Could not open history file. REPL session history will not be persisted.`.
 
-如果是用libc++而不是默认的gnustl来编译的, 那还得把`libc++_shared.so`从NDK复制到android `/data/local/tmp/`,
+如果是用libc++而不是默认的gnustl(libstdc++)来编译的, 那还得把`libc++_shared.so`从NDK复制到android `/data/local/tmp/`,
 然后设定`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/local/tmp`.
 
 这个 `libc++_shared.so`在: 
@@ -840,3 +840,10 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     结果g++不干了,报错说找不到bits/c++config.h。这应该是g++自己的毛病。
     
     所以在mips构架里,android-gcc-toolchain把这些文件子构架里的.h都copy到标准的bits目录下去了。
+    
+- 2016/09/17: NodeJS 6.6.0出来了，就编了一下，不出意外，Limited build是好的，Full build就出了个"std::snprintf照得不到"
+    之类的错误。换成--stl libc++来编译就好了。就这么个破snprintf也没搞好，C++也真够乱的。
+    这个东西是C++11里明确定义有的，可是现在用的是gnustl(libstdc++),里面的<cstdio>里定义了std::printf都没有定义std::snprint，
+    而<string>里也没有包含cstdio，反而包含了一堆拿什么狗屁bits目录。反正就不如lbc++里的清爽。
+    只不过，据NDK里说libc++是还不稳定的库（居然！，某些case没通过，arm下有时崩溃），所以，还是想办法把gnustl里的
+    <cstdio>和<string>给改一下。不过这东西那个该死的GPL3的，...
