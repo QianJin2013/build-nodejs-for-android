@@ -2,7 +2,7 @@
 function _msg { echo "$@" >&2; }
 function _dbg { [[ $NODEJS_BUILD_DBG == 1 ]] && echo "$@" >&2; }
 
-VERSION=1.2
+VERSION=1.2.1
 
 [[ $# == 0 ]] && exec "$0" --help
 
