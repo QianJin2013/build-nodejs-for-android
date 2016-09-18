@@ -81,8 +81,9 @@ it supersede compiler commands in $PATH and add/remove some option.
 
 *Full build will use host compiler to produce host binaries, so need install Xcode(for Mac) or gcc/g++(for linux)* 
 
-**To work with NodeJS 6.6.0, please add `--stl libc++` option to `android-gcc-toolchain` so some C++11 API can be used, 
-otherwise it complains std:snprintf not defined**
+**To work with NodeJS 6.6.0, if you are using old version(<1.9.1) of `android-gcc-toolchain`,
+    you should add `--stl libc++` option to `android-gcc-toolchain` so can use some C++11 API(such as std::snprintf), 
+    otherwise it complains std:snprintf not defined**
 
 ### Full build on Mac
 
@@ -332,8 +333,9 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 
 *Full build需要用host(本机)的编译器生成运行于本机的执行文件，所以需要安装Xcode(for Mac)或者gcc/g++(for linux)* 
 
-**为了NodeJS 6.6.0,得加上`--stl libc++`选项给`android-gcc-toolchain`以便可以使用C++11 API, 
-否则它会报错说std:snprintf not defined**
+**为了NodeJS 6.6.0, 如果使用低版本(<1.9.1)的`android-gcc-toolchain`，
+    那得加上`--stl libc++`选项给`android-gcc-toolchain`以便可以使用C++11 API(例如std::snprintf), 
+    否则它会报错说std:snprintf not defined**
 
 ### Full Build on Mac
 
