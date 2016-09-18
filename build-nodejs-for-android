@@ -127,10 +127,10 @@ _msg "source dir: \"$PWD\"";
 _msg "output dir: \"$OUT\"";
 
 
+#pre-clean
 [[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
 
 if [[ $FULL ]]; then
-#set gyp host_os to explicitly set it so correctly choose source files
     case $OSTYPE in
     darwin*)
         case $ARCH in
@@ -175,4 +175,5 @@ done
 
 ls -lF "$OUT/bin/"* "$OUT/extras/"*
 
+#post-clean
 [[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
