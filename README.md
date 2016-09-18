@@ -81,9 +81,10 @@ it supersede compiler commands in $PATH and add/remove some option.
 
 *Full build will use host compiler to produce host binaries, so need install Xcode(for Mac) or gcc/g++(for linux)* 
 
-**To work with NodeJS 6.6.0, if you are using old version(<1.9.1) of `android-gcc-toolchain`,
-    you should add `--stl libc++` option to `android-gcc-toolchain` so can use some C++11 API(such as std::snprintf), 
-    otherwise it complains std:snprintf not defined**
+To work with NodeJS 6.6.0, if you are using old version(<1.9.1) of `android-gcc-toolchain`, then you should
+    - add `--stl libc++` option to `android-gcc-toolchain` to switch C++ STL so can use some C++11 API(such as std::snprintf), 
+    otherwise it complains std:snprintf not defined. 
+    - `export CCACHE_NODIRECT=` to let CCACHE work in precise(but slower) mode so can detect system include file changes
 
 ### Full build on Mac
 
@@ -333,9 +334,11 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 
 *Full build需要用host(本机)的编译器生成运行于本机的执行文件，所以需要安装Xcode(for Mac)或者gcc/g++(for linux)* 
 
-**为了NodeJS 6.6.0, 如果使用低版本(<1.9.1)的`android-gcc-toolchain`，
-    那得加上`--stl libc++`选项给`android-gcc-toolchain`以便可以使用C++11 API(例如std::snprintf), 
-    否则它会报错说std:snprintf not defined**
+为了NodeJS 6.6.0, 如果使用低版本(<1.9.1)的`android-gcc-toolchain`，那得
+    - 加上`--stl libc++`选项给`android-gcc-toolchain`来切换C++ STL，以便使用C++11 API(例如std::snprintf), 
+    否则它会报错说std:snprintf not defined
+    - `export CCACHE_NODIRECT=` 来让CCACHE用更精确的(但是慢一些)得方式来工作，以便检测出系统include文件的变化。
+    
 
 ### Full Build on Mac
 
