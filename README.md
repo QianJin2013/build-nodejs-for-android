@@ -137,6 +137,7 @@ Successfully tested on real device or emulator
 - nodejs-6.5.0-android-arm
 - nodejs-6.5.0-android-arm64-full
 - nodejs-6.5.0-android-arm64 
+- nodejs-6.6.0-android-arm-full
 
 Some experiences:
 
@@ -153,6 +154,14 @@ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 
 Just run /data/local/tmp/node, be need first set `export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 otherwise `Error: Could not open history file. REPL session history will not be persisted.`.
+
+If it's built with libc++ instead of default gnustl, then you need copy the `libc++_shared.so` from NDK to android `/data/local/tmp/`,
+then set `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/local/tmp`.
+
+The `libc++_shared.so` is located at: 
+- $NDK/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_shared.so, this is the default .so for arm.
+- /sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so, this is the default .so for arm64.  
+- ... please use `find $NDK -name libc++_shared.so` to find all
 
 ### Run npm(NodeJS Package Manager)
 
@@ -379,6 +388,7 @@ Notes:
 - nodejs-6.5.0-android-arm
 - nodejs-6.5.0-android-arm64-full
 - nodejs-6.5.0-android-arm64 
+- nodejs-6.6.0-android-arm-full
 
 一些经验:
 
@@ -395,6 +405,14 @@ adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib
 
 运行/data/local/tmp/node就行了。但是之前得先`export NODE_REPL_HISTORY=/data/local/tmp/node_history`,
 不然会得到`Error: Could not open history file. REPL session history will not be persisted.`.
+
+如果是用libc++而不是默认的gnustl来编译的, 那还得把`libc++_shared.so`从NDK复制到android `/data/local/tmp/`,
+然后设定`export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/data/local/tmp`.
+
+这个 `libc++_shared.so`在: 
+- $NDK/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_shared.so, 这是默认的 .so，为arm的.
+- /sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so, 这是默认的 .so，为arm64的.  
+- ... please use `find $NDK -name libc++_shared.so` to find all
 
 ### 运行npm(NodeJS Package Manager)
 
