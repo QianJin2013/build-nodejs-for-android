@@ -11,6 +11,9 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 - A build environment as a docker image `osexp2000/build-nodejs-for-android` can be used to build on your needs.
     See [Docker Images](#docker-images). 
 
+- There are some [reasons](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules)
+    why it's difficult to fully build nodejs for android, this is why i made the tool `android-gcc-toolchain`.
+
 ## Development Environment
 
 **Source of [NodeJS](https://github.com/nodejs/node): 6.3.1-6.6.0**
@@ -255,6 +258,7 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 - **-lrt**: 试图连接linux特有的librt但实际Mac没有,导致连接错误。
 - **-m32**: 有的编译成32bit,有的是64bit,导致连接出错。
 - **-lpthread**: 忘了加必要的-l某lib的连接选项了,例如-lpthread,导致连接时报莫名其妙的"DSO missing from command line"错误。
+- **gnustl(libstdc++) vs libc++**: 有的代码使用更新的libc++的一点东西，例如std::snprintf，这在标准的gnustl里命名空间不一样。
 
 都是源码里的错误造成的(就是编译设定文件有错误,但是不太好找,每次都要伺候这些很烦)。
 
@@ -843,7 +847,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     
 - 2016/09/17: NodeJS 6.6.0出来了，就编了一下，不出意外，Limited build是好的，Full build就出了个"std::snprintf照得不到"
     之类的错误。换成--stl libc++来编译就好了。就这么个破snprintf也没搞好，C++也真够乱的。
-    这个东西是C++11里明确定义有的，可是现在用的是gnustl(libstdc++),里面的<cstdio>里定义了std::printf都没有定义std::snprint，
+    这个东西是C++11里明确定义有的，可是现在用的是gnustl(libstdc++),里面的<cstdio>里定义了std::printf都没有定义std::snprintf，
     而<string>里也没有包含cstdio，反而包含了一堆拿什么狗屁bits目录。反正就不如lbc++里的清爽。
     只不过，据NDK里说libc++是还不稳定的库（居然！，某些case没通过，arm下有时崩溃），所以，还是想办法把gnustl里的
     <cstdio>和<string>给改一下。不过这东西那个该死的GPL3的，...
