@@ -117,13 +117,13 @@ Use following docker images.
 
 ## Docker images
 
-**The docker image `osexp2000/build-nodejs-for-android` contains a fast build environment, and prebuilt binaries of NodeJS v6.5.0**
+**The docker image `osexp2000/build-nodejs-for-android` contains a fast build environment, and prebuilt binaries of NodeJS v6.5.0, 6.6.0**
 
 Notes:
 - To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
 - Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
-- Build already done. The output are mainly stored at `nodejs-6.5.0-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
-- Initially built on NodeJs v6.5.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline --decorate` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
+- Build already done. The output are mainly stored at `nodejs-*-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
+- Initially built on NodeJs v6.5.0, 6.6.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline --decorate` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
 - You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
 - Quick start of docker:
     - The docker run `-it` means `--interactive --tty`.
@@ -371,14 +371,14 @@ android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 ## Docker images
 
-**Docker image `osexp2000/build-nodejs-for-android`包含了一个便于编译的环境，还有NodeJS 6.5.0版的预编译结果**
+**Docker image `osexp2000/build-nodejs-for-android`包含了一个便于编译的环境，还有NodeJS 6.5.0, 6.6.0版的预编译结果**
 
 Notes:
 - 进入这个linux容器的话,执行`docker run -it osexp2000/build-nodejs-for-android`
-- 里面有nodejs-6.5.0-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
-- 编译已经完成了。生成物主要在`nodejs-6.5.0-*`的bin,lib,include和extras(cctest, openssl-cli...).
+- 里面有nodejs-*-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
+- 编译已经完成了。生成物主要在`nodejs-*-*`的bin,lib,include和extras(cctest, openssl-cli...).
 - 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 最开始是使用了NoeJS v6.5.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline --decorate`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
+- 最开始是使用了NoeJS v6.5.0, 6.6.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline --decorate`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
 - Docker快速入门:
     - 这个docker run里的`-it`表示 `--interactive --tty`.
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
