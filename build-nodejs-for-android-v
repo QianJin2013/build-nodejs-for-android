@@ -21,6 +21,8 @@ _msg "------------------------------------------------------------------------"
 _msg current version of source of NodeJS: `git log -1 --oneline`
 _msg "------------------------------------------------------------------------"
 
+mkdir ../logs 2>/dev/null
+
 build-nodejs-for-android . --arch arm    -o ../nodejs-$TAG-android-arm         --pre-clean --post-clean         2>&1 | tee ../logs/nodejs-$TAG-android-arm
 build-nodejs-for-android . --arch arm    -o ../nodejs-$TAG-android-arm-full    --pre-clean --post-clean --full  2>&1 | tee ../logs/nodejs-$TAG-android-arm-full
 build-nodejs-for-android . --arch arm64  -o ../nodejs-$TAG-android-arm64       --pre-clean --post-clean         2>&1 | tee ../logs/nodejs-$TAG-android-arm64
