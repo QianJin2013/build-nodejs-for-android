@@ -18,7 +18,7 @@ TAG=$1
 git checkout "v$TAG" || exit 1
 _msg ""
 _msg "------------------------------------------------------------------------"
-_msg current version of source of NodeJS: `git log -1 --oneline`
+_msg current version of source of NodeJS: `git log -1 --oneline --decorate`
 _msg "------------------------------------------------------------------------"
 
 mkdir ../logs 2>/dev/null
