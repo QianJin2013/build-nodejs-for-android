@@ -31,15 +31,11 @@ Auxiliary tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
 
 (Optional) CCACHE:
-- **To speed up repeating compilation, you'd better add `--ccache` option for `android-gcc-toolchain`**
+- **To speed up repeating compilation, you'd better install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:
 
-    First you need install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:
-    
-    ```
-    export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-    export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-    ccache -M 50G                   #set cache size once is ok
-    ```
+    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
+    - `export CCACHE_DIR=some_dir`(default is ~/.ccache).
+    - run `ccache -M 50G` once to set max cache size(default is 5G).
     
 (Optional) `build-nodejs-for-android`: (provided by this project)
 - This further simplified build. e.g. The following commands do all limited and full build for nodejs 6.5.0, output to specified dirs.
@@ -79,7 +75,8 @@ Using `android-gcc-toolchain --host ... -C`, you can build nodejs **with all fea
 The `--host ...` means [Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
 it supersede compiler commands in $PATH and add/remove some option.
 
-*Full build will use host compiler to produce host binaries, so need install Xcode(for Mac) or gcc/g++(for linux)* 
+*Full build will use host compiler to produce host binaries, so need install Xcode(for Mac) 
+or gcc/g++(for linux) by `sudo apt-get install gcc g++ gcc-multilib g++-multilib`* 
 
 To work with NodeJS 6.6.0, if you are using old version(<1.9.1) of `android-gcc-toolchain`, then you should
 - add `--stl libc++` option to `android-gcc-toolchain` to switch C++ STL so can use some C++11 API(such as std::snprintf), 
@@ -284,15 +281,11 @@ NDK:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
 
 (可选) CCACHE
-- **为了快速地重复编译,建议给`android-gcc-toolchain`加上`--ccache`选项**,这个会把通过`ccache`的wrapper来调用原来的gcc等命令。
+- **为了快速地重复编译,建议安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:
 
-    先安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:
-    
-    ```
-    export USE_CCACHE=1             #you'd better put this line to your ~/.bash_profile etc.
-    export CCACHE_DIR=~/ccache      #you'd better put this line to your ~/.bash_profile etc.
-    ccache -M 50G                   #set cache size once is ok
-    ```
+    - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE(否则得每次在命令行加--ccache).
+    - `export CCACHE_DIR=some_dir`(默认是~/.ccache).
+    - 执行一次`ccache -M 50G`来设定最大缓存大小(默认是5G).
 
 (可选) 辅助工具 `build-nodejs-for-android`: (就在这个project里)
 - 更加简化编译命令. 例如，如下这些命令囊括了接下来所有的命令内容，产生6.5.0的限制版和完全版，放到指定的目录里。
@@ -332,7 +325,8 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 这个`--host ...`是[Mandatory host compiler rules](https://github.com/sjitech/android-gcc-toolchain#user-content-host-compiler-rules), 
 是在$PATH里超越本机编译器命令然后加减一点选项。
 
-*Full build需要用host(本机)的编译器生成运行于本机的执行文件，所以需要安装Xcode(for Mac)或者gcc/g++(for linux)* 
+*Full build需要用host(本机)的编译器生成运行于本机的执行文件，所以需要安装Xcode(for Mac)
+或者gcc/g++(for linux) by `sudo apt-get install gcc g++ gcc-multilib g++-multilib`* 
 
 为了NodeJS 6.6.0, 如果使用低版本(<1.9.1)的`android-gcc-toolchain`，那得
 - 加上`--stl libc++`选项给`android-gcc-toolchain`来切换C++ STL，以便使用C++11 API(例如std::snprintf), 
