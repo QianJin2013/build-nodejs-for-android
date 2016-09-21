@@ -21,7 +21,8 @@ Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuil
 OS:
 - **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit), (Optional)Xcode 8.0(8A218a)
 - **Linux**: Ubuntu 16.04 (64bit), (Optional)gcc/g++ 5.4.0
-- **Windows**: Windows Pro 7. [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
+- **Windows**: Windows Pro 7 (64bit).  [Docker-Toolbox](https://www.docker.com/products/docker-toolbox).
+    *Although `android-gcc-toolchain` supports MINGW, NodeJS build system mix \\ and / in all paths so not works*
 
 NDK: 
  - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
@@ -31,7 +32,7 @@ Auxiliary tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
 
 (Optional) CCACHE:
-- **To speed up repeating compilation, you'd better install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:
+- **To speed up repeating compilation, you'd better install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:**
 
     - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
     - `export CCACHE_DIR=some_dir`(default is ~/.ccache).
@@ -104,7 +105,7 @@ android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/c
 android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
-For x86:You must install 32bit lib by `sudo apt-get install -y g++-multilib gcc-multilib`,otherwise complained about sys/cdefs.h etc. not found.
+For x86:You must install 32bit lib by `sudo apt-get install -y g++-multilib gcc-multilib`, otherwise complained about sys/cdefs.h etc. not found.
 
 ### Full build on Windows
  
@@ -271,7 +272,8 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 编译工作机器:
 - **Mac**: OS X 10.11.5/10.11.6 EI Capitan (64bit), (可选)Xcode 8.0(8A218a)
 - **Linux**: Ubuntu 16.04 (64bit), (可选)gcc/g++ 5.4.0
-- **Windows**: Windows Pro 7. [Docker-Toolbox](https://www.docker.com/products/docker-toolbox)
+- **Windows**: Windows Pro 7 (64bit).  [Docker-Toolbox](https://www.docker.com/products/docker-toolbox).
+    *虽然`android-gcc-toolchain`支持MINGW，但是NodeJS的编译系统把所有的路径都混合使用了mix和/，所以导致make失败*
 
 NDK: 
  - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
@@ -281,7 +283,7 @@ NDK:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
 
 (可选) CCACHE
-- **为了快速地重复编译,建议安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:
+- **为了快速地重复编译,建议安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:**
 
     - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE(否则得每次在命令行加--ccache).
     - `export CCACHE_DIR=some_dir`(默认是~/.ccache).
@@ -355,7 +357,7 @@ android-gcc-toolchain x64    --host gcc-lpthread         -C <<< "sed -i.bak 's/c
 android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
 
-对于x86:必须先安装一些32bit的lib:`sudo apt-get install -y g++-multilib gcc-multilib`,否则它报错说sys/cdefs.h找不到。
+对于x86:必须先安装一些32bit的lib:`sudo apt-get install -y g++-multilib gcc-multilib`, 否则它报错说sys/cdefs.h找不到。
 
 ### Full build on Windows
  

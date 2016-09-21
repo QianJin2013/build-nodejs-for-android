@@ -2,7 +2,7 @@
 function _msg { echo "$@" >&2; }
 function _dbg { [[ $NODEJS_BUILD_DBG == 1 ]] && echo "$@" >&2; }
 
-VERSION=1.2.2
+VERSION=1.2.3
 
 [[ $# == 0 ]] && exec "$0" --help
 
@@ -128,7 +128,7 @@ _msg "output dir: \"$OUT\"";
 
 
 #pre-clean
-[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
+[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && type -p make > /dev/null && make clean; [[ -d .git ]] && type -p git > /dev/null && { git clean -fdx; git reset --hard; }; rm -fr out node; }
 
 if [[ $FULL ]]; then
     case $OSTYPE in
@@ -165,7 +165,7 @@ fi
 rm -fr "$OUT/"*
 
 #copy build result to $OUT/{bin,lib,include}
-make DESTDIR="$OUT" PREFIX="" install | grep -vE '^installing|^symlinking|^removing'
+android-gcc-toolchain $ARCH $APIL $STL -C make DESTDIR="$OUT" PREFIX="" install | grep -vE '^installing|^symlinking|^removing'
 [[ ${PIPESTATUS[0]} != 0 ]] && { _msg "failed to run make install"; exit 1; }
 
 mkdir "$OUT/extras" && \
@@ -176,4 +176,4 @@ done
 ls -lF "$OUT/bin/"* "$OUT/extras/"*
 
 #post-clean
-[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
+[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && type -p make > /dev/null && make clean; [[ -d .git ]] && type -p git > /dev/null && { git clean -fdx; git reset --hard; }; rm -fr out node; }
