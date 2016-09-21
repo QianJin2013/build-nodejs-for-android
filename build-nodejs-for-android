@@ -128,7 +128,7 @@ _msg "output dir: \"$OUT\"";
 
 
 #pre-clean
-[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
+[[ $PRE_CLEAN ]] && { [[ -f Makefile ]] && type -p make > /dev/null && make clean; [[ -d .git ]] && type -p git > /dev/null && { git clean -fdx; git reset --hard; }; rm -fr out node; }
 
 if [[ $FULL ]]; then
     case $OSTYPE in
@@ -176,4 +176,4 @@ done
 ls -lF "$OUT/bin/"* "$OUT/extras/"*
 
 #post-clean
-[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && make clean; [[ -d .git ]] && { git clean -fdx; git reset --hard; }; rm -fr out node; }
+[[ $POST_CLEAN ]] && { [[ -f Makefile ]] && type -p make > /dev/null && make clean; [[ -d .git ]] && type -p git > /dev/null && { git clean -fdx; git reset --hard; }; rm -fr out node; }
