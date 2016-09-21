@@ -6,8 +6,8 @@ function _msg { echo "$@" >&2; }
 thisDir=${0%/*}; if target=`readlink "${0}"`; then if [[ $target == /* ]]; then thisDir=${target%/*}; elif [[ $target == */* ]]; then thisDir+=/${target%/*}; fi; fi
 parentDir=`cd "$thisDir"/.. && pwd` || return 1
 
-cd "$parentDir"/build-nodejs-for-android && git pull || exit 1
-cd "$parentDir"/android-gcc-toolchain && git pull || exit 1;
+cd "$parentDir"/build-nodejs-for-android && { _msg upgrade build-nodejs-for-android; git pull || exit 1; }
+cd "$parentDir"/android-gcc-toolchain && { _msg upgrade android-gcc-toolchain; git pull || exit 1; }
 
 cd "$parentDir"/node || exit 1
 git clean -fdx; git reset --hard; git fetch;
