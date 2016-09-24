@@ -2,11 +2,9 @@
 function _msg { echo "$@" >&2; }
 function _dbg { [[ $NODEJS_BUILD_DBG == 1 ]] && echo "$@" >&2; }
 
-VERSION=1.2.3
+VERSION=1.3
 
-[[ $# == 0 ]] && exec "$0" --help
-
-IN=""; OUT=""; PRE_CLEAN=""; POST_CLEAN=""; ARCH=""; APIL=""; STL=""; VERBOSE=""; FULL=""; FORCE="";
+OUT=""; PRE_CLEAN=""; POST_CLEAN=""; ARCH=""; APIL=""; STL=""; VERBOSE=""; FULL=""; FORCE=""; BRANCH="";
 
 while [[ $# -gt 0 ]]; do
     _dbg "\"$1\""
@@ -26,6 +24,9 @@ while [[ $# -gt 0 ]]; do
             ""|-*) _msg "expect C++ STL behind $1. Must be gnustl(default)|libc++|stlport"; exit 1;;
             *) _msg "invalid C++ STL \"$2\". Must be gnustl(default)|libc++|stlport"; exit 1;;
             esac
+            ;;
+    arm|arm64|x86|x64|mipsel)
+            ARCH=$1; _dbg " ->ARCH"
             ;;
     -o|--out)  case $2 in
             ""|-*) _msg "expect output dir behind $1"; exit 1;;
@@ -51,19 +52,18 @@ while [[ $# -gt 0 ]]; do
             break
             ;;
     --*)
-            _msg "invalid long option \"$1\". Must be --out|--full|--force|--pre-clean|--post-clean|--arch|--api|--stl|--version|--help"
+            _msg "invalid long option \"$1\". Must be --out|--full|--force|--pre-clean|--post-clean|--arch|--api|--stl|--verbose|--version|--help"
             exit 1
             ;;
     -*)
-            _msg "invalid short option \"$1\". Must be -o(out)"
+            _msg "invalid short option \"$1\". Must be -o(out) or -v(verbose)"
             exit 1
             ;;
     "")
             _dbg " :skip isolated empty arg"
             ;;
     *)
-            IN=$1; _dbg " ->IN"
-            ;;
+            BRANCH=$1; _dbg " ->BRANCH"
     esac
 
     shift
@@ -72,13 +72,24 @@ done
 case $1 in
 --help)
     _msg "${0##*/} $VERSION"
-    _msg "Enable you build nodejs easily."
+    _msg "Build node.js for android from source in current dir"
     _msg ""
-    _msg "Usage: ${0##*/} [OPTIONS] <SourceDir>"
+    _msg "Usage: ${0##*/} [OPTIONS] [branch]"
     _msg "--------------------------------------------------------------------------------"
+    _msg "branch          git branch name. For example: v6.6.0, master"
+    _msg "                This will use git to checkout the branch, then build for all "
+    _msg "                arch (arm arm64 x86 x64 mipsel)."
+    _msg "                The output will be saved at "
+    _msg "                 ../nodejs-N.N.N-android-ARCH"
+    _msg "                 ../nodejs-N.N.N-android-ARCH-full"
+    _msg "                The ARCH means above arch. The N.N.N means branch(v striped)"
+    _msg "                The .. maybe replaced by the DIR specified by -o,--out"
+    _msg ""
+    _msg "                Once branch is specified, only following options will be used:"
+    _msg "                 -o --out --api --stl -v --verbose"
     _msg "OPTIONS:"
     _msg " -o DIR, --out DIR"
-    _msg "                Output dir. By default is <SourceDir>-out"
+    _msg "                Output dir. By default is \$PWD-out"
     _msg " --force        Enable overwrite output dir if already exists"
     _msg " --full"
     _msg "                Full build, not specify any --without-... option to NodeJS,"
@@ -90,13 +101,14 @@ case $1 in
     _msg "                then (rm -fr out) as final resort"
     _msg " --post-clean   Clean on build success. The cleaning is same as --pre-clean"
     _msg ""
-    _msg " --arch   ARCH  Android architecture:"
+    _msg " [--arch] ARCH  Android architecture:"
     _msg "                {arm(default)|arm64|x86|x64|mipsel}"
     _msg " --api    APIL  Android API level:"
     _msg "                {min(default)|max|an integer}"
     _msg " --stl    STL   C++ STL to use:"
     _msg "                {gnustl(default)|libc++|stlport}"
     _msg ""
+    _msg " -v, --verbose  Show verbose information, include compiler arguments"
     _msg " --version      Show version of this tool"
     exit 0
     ;;
@@ -106,22 +118,66 @@ case $1 in
     ;;
 esac
 
-[[ ! $IN ]] && { _msg "expect source dir as argument"; exit 1; }
-[[ ! -d $IN ]] && { _msg "invalid source dir \"$IN\""; exit 1; }
+[[ $VERBOSE ]] && export AGCC_VERBOSE=1
 
-[[ ! $OUT ]] && { OUT=`cd $IN && pwd`-out || exit 1; }
+if [[ $BRANCH ]]; then
+    VER=${BRANCH#v} #remove first char v
+
+    _msg "clean && checkout $BRANCH"
+    git clean -fdx && git reset --hard && git checkout "$BRANCH" || exit 1
+    _msg ""
+    _msg "------------------------------------------------------------------------"
+    _msg current version of source of NodeJS:
+    git log -1 --oneline --decorate
+    _msg "------------------------------------------------------------------------"
+
+    [[ ! $OUT ]] && OUT=..
+    mkdir $OUT/logs 2>/dev/null
+
+    [[ $APIL ]] && APIL="--api $APIL"
+    [[ $STL ]] && STL="--stl $STL"
+
+    results=()
+
+    for arch in arm arm64 x86 x64 mipsel; do
+
+        "$0" --arch $arch    -o $OUT/nodejs-$VER-android-$arch         $APIL $STL --pre-clean --post-clean         --force 2>&1 \
+        | tee $OUT/logs/nodejs-$VER-android-$arch
+
+        if [[ ${PIPESTATUS[0]} == 0 ]]; then
+            results+=("SUCCESS: $OUT/nodejs-$VER-android-$arch")
+        else
+            results+=("FAILURE: $OUT/nodejs-$VER-android-$arch")
+        fi
+
+        "$0" --arch $arch    -o $OUT/nodejs-$VER-android-$arch-full    $APIL $STL --pre-clean --post-clean --full  --force 2>&1 \
+        | tee $OUT/logs/nodejs-$VER-android-$arch-full
+
+        if [[ ${PIPESTATUS[0]} == 0 ]]; then
+            results+=("SUCCESS: $OUT/nodejs-$VER-android-$arch-full")
+        else
+            results+=("FAILURE: $OUT/nodejs-$VER-android-$arch-full")
+        fi
+    done
+
+    _msg "--------------------------------------------------------------------------------"
+    for r in "${results[@]}"; do
+        _msg $r
+    done
+    _msg Done, please check $OUT/logs/ and $OUT/nodejs-$VER-android-\* to see result.
+    exit 0
+fi
+
+[[ ! $OUT ]] && { OUT=$PWD-out || exit 1; }
 if [[ ! -d $OUT ]]; then
     mkdir -pv "$OUT" || exit 1
 else
     [[ ! $FORCE ]] && { _msg "auto chosen output dir already exists: \"$OUT\". To enable overwrite it, use --force"; exit 1; }
 fi
-OUT=`cd "$OUT" && pwd` || exit 1
 
 [[ ! $ARCH ]] && ARCH=arm
 [[ ! $APIL ]] && APIL=min
 [[ ! $STL ]] && STL=gnustl
-
-cd "$IN" || exit 1
 
 _msg "source dir: \"$PWD\"";
 _msg "output dir: \"$OUT\"";
@@ -136,7 +192,7 @@ if [[ $FULL ]]; then
         case $ARCH in
         arm    ) android-gcc-toolchain arm    $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make" ;;
         arm64  ) android-gcc-toolchain arm64  $APIL $STL --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make" ;;
-        x86    ) android-gcc-toolchain x86    $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make" ;;
+        x86    ) android-gcc-toolchain x86    $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make" ;;
         x64    ) android-gcc-toolchain x64    $APIL $STL --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make" ;;
         mipsel ) android-gcc-toolchain mipsel $APIL $STL --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make" ;;
         esac;;

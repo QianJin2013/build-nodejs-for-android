@@ -25,16 +25,15 @@ OS:
     *Although `android-gcc-toolchain` supports MINGW, NodeJS build system mix \\ and / in all paths so not works*
 
 NDK: 
- - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
-   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- [NDK 12.1.29](https://developer.android.com/ndk/downloads/index.html)
 
 Auxiliary tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
 
 (Optional) CCACHE:
-- **To speed up repeating compilation, you'd better install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:**
-
-    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
+- If you clean & compile repeatedly, **you'd better setup [CCACHE](https://ccache.samba.org/) to speed up repeating compilation**.
+    - Run `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux
+    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE.
     - `export CCACHE_DIR=some_dir`(default is ~/.ccache).
     - run `ccache -M 50G` once to set max cache size(default is 5G).
     
@@ -43,16 +42,16 @@ Auxiliary tool:
 
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean .
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean . --full
+    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean
+    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean
+    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean --full
+    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean
+    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean
+    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean
+    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean --full
     ```
 
 ## Limited build
@@ -89,7 +88,7 @@ otherwise it complains std:snprintf not defined.
 ```
 android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
 android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
 android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
 android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
@@ -276,16 +275,15 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
     *虽然`android-gcc-toolchain`支持MINGW，但是NodeJS的编译系统把所有的路径都混合使用了mix和/，所以导致make失败*
 
 NDK: 
- - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
-   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- [NDK 12.1.29](https://developer.android.com/ndk/downloads/index.html)
 
 辅助工具 tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
 
 (可选) CCACHE
-- **为了快速地重复编译,建议安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:**
-
-    - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE(否则得每次在命令行加--ccache).
+- 如果重复的clean&make,那**最好安装[CCACHE](https://ccache.samba.org/)以便用编译缓存来加速这种重复编译**.
+    - 安装: `brew install ccache` on Mac或者`sudo apt-get install ccache` on Linux
+    - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE.
     - `export CCACHE_DIR=some_dir`(默认是~/.ccache).
     - 执行一次`ccache -M 50G`来设定最大缓存大小(默认是5G).
 
@@ -294,16 +292,16 @@ NDK:
 
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean .
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean . --full
+    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean
+    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean
+    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean --full
+    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean
+    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean
+    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean --full
+    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean
+    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean --full
     ```
 
 ## Limited Build
@@ -340,7 +338,7 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 ```
 android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
 android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
 android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
 android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
@@ -817,7 +815,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     当然,到底在那个配置文件里加这个选项,有得头痛的层层追寻配置,不想干了。还不如黑路子快,
     最终,把这一切集成到android-gcc-toolchain里,通过`--host gcc-lpthread`选项可以实现。
 
-- 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。
+- 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。2016/09/22:删除这个选项了，单纯靠USE_CCACHE=1环境变量来表达这个选项。
 
 - 2016/09/06: 编译android-mipsel版时,碰到bits/c++config.h找不到之类的错误。似乎以前碰到过查了一下搞好了,可又忘了。得做个memo。
 
