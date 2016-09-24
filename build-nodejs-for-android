@@ -62,6 +62,9 @@ while [[ $# -gt 0 ]]; do
     "")
             _dbg " :skip isolated empty arg"
             ;;
+    *)
+            _msg "invalid TAG \"$1\". must be v*.*.*, for example: v6.6.0"; exit 1
+            ;;
     esac
 
     shift
@@ -107,7 +110,7 @@ case $1 in
     _msg "                The log will be saved as as build.log at above dir."
     _msg "                The OUT_DIR is \"..\" by default."
     _msg ""
-    _msg " --pre-clean    Remove \"out\" dir before build"
+    _msg " --pre-clean    Remove ./out/* before build"
     _msg " -v, --verbose  Show verbose information, include compiler arguments"
     _msg " --version      Show version of this tool"
     _msg ""
@@ -189,13 +192,13 @@ flagFilePath=out/.build-nodejs-for-android-$ARCH; [[ $BUILD_TYPE == full ]] && f
 if [[ -d out ]]; then
     fileList=(out/.build-nodejs-for-android-*)
     if [[ ${fileList[0]} != *\** && ${fileList[0]} != $flagFilePath ]]; then
-        _msg "Removing \"out\" dir because arch or build type is different as previous build"
-        rm -fr out || rm -fr out/* || mv -f out out.old
+        _msg "Removing out/* because arch or build type is different as previous build"
+        rm -fr out/*
     fi
+    rm -f out/.build-nodejs-for-android-*
 else
     mkdir out
 fi
-rm -f out/.build-nodejs-for-android-*
 touch $flagFilePath
 
 #OK, now build nodejs with android-gcc-toolchain
