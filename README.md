@@ -42,16 +42,16 @@ Auxiliary tool:
 
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean --full
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm        
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm-full    --full
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64      
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64-full  --full
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86        
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86-full    --full
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64        
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64-full    --full
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel     
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel-full --full
     ```
 
 ## Limited build
@@ -292,16 +292,16 @@ NDK:
 
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean --full
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm        
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm-full    --full
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64      
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64-full  --full
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86        
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86-full    --full
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64        
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64-full    --full
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel     
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel-full --full
     ```
 
 ## Limited Build
