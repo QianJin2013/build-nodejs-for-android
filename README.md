@@ -1,5 +1,5 @@
 # build-nodejs-for-android-perfectly
-Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuilt binaries via docker images.
+Build nodejs for android(arm,arm64,x86,x64,mipsel) perfectly and provide prebuilt binaries, and a docker image as workbench.
 
 - `Perfectly` means do not add any `--without-...` option, nor modifying any source(include build settings) as possible.
     Accomplished by tool [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain).
@@ -25,35 +25,48 @@ OS:
     *Although `android-gcc-toolchain` supports MINGW, NodeJS build system mix \\ and / in all paths so not works*
 
 NDK: 
- - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
-   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- [NDK 12.1.29](https://developer.android.com/ndk/downloads/index.html)
 
 Auxiliary tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
 
 (Optional) CCACHE:
-- **To speed up repeating compilation, you'd better install `ccache` by `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux. then:**
-
-    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE(otherwise specify --ccache every time).
-    - `export CCACHE_DIR=some_dir`(default is ~/.ccache).
-    - run `ccache -M 50G` once to set max cache size(default is 5G).
+- If you clean & compile repeatedly, **you'd better setup [CCACHE](https://ccache.samba.org/) to speed up repeating compilation**.
+    - Run `brew install ccache` on Mac or `sudo apt-get install ccache` on Linux
+    - `export USE_CCACHE=1` to tell android-gcc-toolchain to use CCACHE.
+    - optional: `export CCACHE_DIR=some_dir_in_fast_disk`(default is ~/.ccache).
+    - optional: run `ccache -M 50G` once to set max cache size(default is 5G).
     
 (Optional) `build-nodejs-for-android`: (provided by this project)
-- This further simplified build. e.g. The following commands do all limited and full build for nodejs 6.5.0, output to specified dirs.
+- **Further simplified build commands**. e.g. The following commands do all things in other chapters,
+    build v6.5.0 for all archs(arm,...), limited and full build, output to specified dirs.
 
+    A single command 
+    ```
+    cd node && build-nodejs-for-android v6.5.0
+    ``` 
+    or following commands:
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean .
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean . --full
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm        
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm-full    --full
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64      
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64-full  --full
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86        
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86-full    --full
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64        
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64-full    --full
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel     
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel-full --full
     ```
+
+## Common Notes
+
+- **[You can view every command line of compiler command](https://github.com/sjitech/android-gcc-toolchain#user-content-show-compiler-command-line)**
+    invoked by `build-nodejs-for-android` or `android-gcc-toolchain`, directly or in-directly.
+
+    Just `export AGCC_VERBOSE=1` or add `-v`(`--verbose`) to above tools.
+    The compiler commands here also include ar as ranlib ld strip nm. 
 
 ## Limited build
 
@@ -89,7 +102,7 @@ otherwise it complains std:snprintf not defined.
 ```
 android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
 android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
 android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
 android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
@@ -119,17 +132,14 @@ Use following docker images.
 
 Notes:
 - To enter the container, run `docker run -it osexp2000/build-nodejs-for-android`
-- Name conventions: `-full` means full version(no `--without-...`), otherwise means --without-snapshot --without-inspector --without-intl.
-- Build already done. The output are mainly stored at `nodejs-*-*` bin(node),lib,include,and extras(cctest, openssl-cli...).
-- Initially built on NodeJs v6.5.0, 6.6.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline --decorate` to confirm version,`git checkout v6.4.0` or `git checkout master` for latest source.
+- Build already done. The output are mainly stored at `nodejs-VER-ARCH[-full]`/bin(node),lib,include,share,and extras(cctest, openssl-cli...).
+- Initially built on NodeJs v6.5.0, 6.6.0, at `~/node`, you can use git there, e.g. `git log -1 --oneline --decorate` to confirm version.
 - You can run `build-nodejs-for-android ...` in the container to build yourself, it is fast for unchanged files because of ccache.
-- Quick start of docker:
-    - The docker run `-it` means `--interactive --tty`.
+- Tips about docker file in/out:
     - Use volume mapping `-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE` to map dir/files to container. 
       Note: **Docker-Toolbox on Windows need host dir or files is under `C:\Users\...`(e.g. C:\Users\q\Downloads),
-      and the `HOST_DIR_OR_FILE` must be converted to `/c/Users/...` style.**
+      and the `HOST_DIR_OR_FILE` must be converted to `/c/Users/...` style. Besides, need env var MSYS_NO_PATHCONV=1**
     - Use `docker cp` to copy files in/out when forgot to use volume mapping.
-    - Do not specify `-t`(`--tty`) if to feed commands to docker via <<<"Here String" or <<EOF Here Document.
 
 ----
 
@@ -152,6 +162,7 @@ adb push /home/devuser/nodejs-6.5.0-arm/bin/node /data/local/tmp/
 adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
+*NodeJS itself only need /home/devuser/nodejs-6.5.0-arm/bin/node, the lib is just for npm*
 
 ### Run NodeJS
 
@@ -212,7 +223,7 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 
 # NodeJS for Android完美编译大全
 
-完美地编译了NodeJS for android-{arm,arm64,x86,x64,mipsel},并且通过Docker提供预编译版,也可以作为持续编译环境。
+完美地编译了NodeJS for android-{arm,arm64,x86,x64,mipsel},并且提供预编译版,和作为持续编译环境的Docker image。
 
 - 完美, 意思是不去掉任何功能(不加`--without-...`选项),尽量不修改任何源码(包括编译设定文件)。
   借助工具[android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain)
@@ -245,9 +256,8 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
 
 例如在Mac上编译NodeJS for android-arm64,不去掉任何功能,不修改任何源码(包括编译设定文件),这样的完美编译方法,居然没找到(arm的也是)!
 
-**复杂之处**是因为要生成的东西不仅有node,还有cctest, openssl-cli,似乎是测试工程用的,
-而且,**还有用Host(编译工作机器例如Mac/Linux)编译器生成一些Host上运行的临时的执行文件(mksnapshot,icupkg,genccode,genrb,iculslocs)。**
-编译设定环节层次太多(gyp,autoconf,CMake,...),不容易完全掌控。
+>**复杂之处是：不仅使用用Android的编译器，还有用Host(编译工作机器例如Mac/Linux)编译器，干嘛呢？生成一些Host上运行的临时的执行文件(mksnapshot,icupkg,genccode...)。**
+而且，编译设定环节层次太多(gyp,autoconf,CMake,...),不容易完全掌控。
     
 就算把gyp所需要的环境变量`CC_target`...,`GYP_DEFINES="host_os=<mac|linux>"`
 以及通用的`CXX_host`,`CXX_FLAGS`等设好并添加一些选项也依然会有某些工程不遵循设定。
@@ -276,35 +286,47 @@ $HOME/node $HOME/lib/node_modules/npm/bin/npm-cli.js "$@"
     *虽然`android-gcc-toolchain`支持MINGW，但是NodeJS的编译系统把所有的路径都混合使用了mix和/，所以导致make失败*
 
 NDK: 
- - NDK 12.1.29. [For Mac 64bit](https://dl.google.com/android/repository/android-ndk-r12b-darwin-x86_64.zip),
-   [For Linux 64bit](https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip)
+- [NDK 12.1.29](https://developer.android.com/ndk/downloads/index.html)
 
 辅助工具 tool:
 - [android-gcc-toolchain](https://github.com/sjitech/android-gcc-toolchain),下载一下就好了。
 
 (可选) CCACHE
-- **为了快速地重复编译,建议安装ccache:`brew install ccache` on Mac or `sudo apt-get install ccache` on Linux。然后:**
-
-    - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE(否则得每次在命令行加--ccache).
-    - `export CCACHE_DIR=some_dir`(默认是~/.ccache).
-    - 执行一次`ccache -M 50G`来设定最大缓存大小(默认是5G).
+- 如果重复的clean&make,那**最好安装[CCACHE](https://ccache.samba.org/)以便用编译缓存来加速这种重复编译**.
+    - 安装: `brew install ccache` on Mac或者`sudo apt-get install ccache` on Linux
+    - `export USE_CCACHE=1` 告诉android-gcc-toolchain使用CCACHE.
+    - 可选: `export CCACHE_DIR=some_dir_in_fast_disk`(默认是~/.ccache).
+    - 可选: 执行一次`ccache -M 50G`来设定最大缓存大小(默认是5G).
 
 (可选) 辅助工具 `build-nodejs-for-android`: (就在这个project里)
-- 更加简化编译命令. 例如，如下这些命令囊括了接下来所有的命令内容，产生6.5.0的限制版和完全版，放到指定的目录里。
+- **近一步简化了编译命令**. 例如，如下这些命令做了其他所有章节里的事，编译v6.5.0的所有构架(arm,...),限制版和完全版，放到指定的目录里。
 
+    一个命令
+    ```
+    cd node && build-nodejs-for-android v6.5.0
+    ```
+    或者如下组合命令:
     ```
     cd node && git checkout v6.5.0
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm         --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm    -o ../nodejs-6.5.0-android-arm-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64       --pre-clean --post-clean .
-    build-nodejs-for-android --arch arm64  -o ../nodejs-6.5.0-android-arm64-full  --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x86    -o ../nodejs-6.5.0-android-x86-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64         --pre-clean --post-clean .
-    build-nodejs-for-android --arch x64    -o ../nodejs-6.5.0-android-x64-full    --pre-clean --post-clean . --full
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel      --pre-clean --post-clean .
-    build-nodejs-for-android --arch mipsel -o ../nodejs-6.5.0-android-mipsel-full --pre-clean --post-clean . --full
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm        
+    build-nodejs-for-android arm    -o ../nodejs-6.5.0-android-arm-full    --full
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64      
+    build-nodejs-for-android arm64  -o ../nodejs-6.5.0-android-arm64-full  --full
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86        
+    build-nodejs-for-android x86    -o ../nodejs-6.5.0-android-x86-full    --full
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64        
+    build-nodejs-for-android x64    -o ../nodejs-6.5.0-android-x64-full    --full
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel     
+    build-nodejs-for-android mipsel -o ../nodejs-6.5.0-android-mipsel-full --full
     ```
+
+## 共同说明
+
+- **[你可以查看到每个编译命令的命令行](https://github.com/sjitech/android-gcc-toolchain#user-content-show-compiler-command-line)**，
+    只要是从`build-nodejs-for-android`或者`android-gcc-toolchain`里引发的，直接的或者间接的都行。
+
+    只要`export AGCC_VERBOSE=1`或者把`-v`(`--verbose`)选项加到上述工具。
+    这里编译命令也包括了ar as ranlib ld strip nm。
 
 ## Limited Build
 
@@ -340,7 +362,7 @@ android-gcc-toolchain mipsel <<< "./configure --dest-cpu=mipsel --dest-os=androi
 ```
 android-gcc-toolchain arm    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=arm    --dest-os=android && make"
 android-gcc-toolchain arm64  --host ar-dual-os,gcc-no-lrt         -C <<< "./configure --dest-cpu=arm64  --dest-os=android && make"
-android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=x86    --dest-os=android && make"
+android-gcc-toolchain x86    --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x86 --dest-os=android && make"
 android-gcc-toolchain x64    --host ar-dual-os,gcc-no-lrt         -C <<< "sed -i.bak 's/cross_compiling = target_arch != host_arch/cross_compiling = True/' configure && ./configure --dest-cpu=x64 --dest-os=android --openssl-no-asm && make"
 android-gcc-toolchain mipsel --host ar-dual-os,gcc-no-lrt,gcc-m32 -C <<< "./configure --dest-cpu=mipsel --dest-os=android && make"
 ```
@@ -371,17 +393,14 @@ android-gcc-toolchain mipsel --host gcc-lpthread,gcc-m32 -C <<< "./configure --d
 
 Notes:
 - 进入这个linux容器的话,执行`docker run -it osexp2000/build-nodejs-for-android`
-- 里面有nodejs-*-*各种构架的结果: 后缀`-full`表示完全版(没有使用`--without...`),否则表示--without-snapshot --without-inspector --without-intl.
-- 编译已经完成了。生成物主要在`nodejs-*-*`的bin,lib,include和extras(cctest, openssl-cli...).
+- 编译已经完成了。生成物主要在`nodejs-VER-ARCH[-full]`/bin(node),lib,include,share,和extras(cctest, openssl-cli...).
+- 最开始是使用了NoeJS v6.5.0, 6.6.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline --decorate`来确认版本。
 - 可以在容器里运行`build-nodejs-for-android ...`来自己编译, 未改变的源码由于被ccache了所以速度很快。
-- 最开始是使用了NoeJS v6.5.0, 6.6.0源码. 在`~/node`下，是可以用git管理的，例如：`git log -1 --oneline --decorate`来确认版本,`git checkout v6.4.0`或者`git checkout master`取最新源码.
-- Docker快速入门:
-    - 这个docker run里的`-it`表示 `--interactive --tty`.
+- 关于Docker的文件in/out的tips:
     - 可以使用卷映射`-v HOST_DIR_OR_FILE:CONTAINER_DIR_OR_FILE`来把本机的目录或者文件映射到容器里。 
       注意: **Docker-Toolbox on Windows要求:host(就是PC机)这边的目录或文件必须是为`C:\Users\...`之下(例如C:\Users\q\Downloads),
-      并且`HOST_DIR_OR_FILE`必须转换成`/c/Users/...`形式.**
+      并且`HOST_DIR_OR_FILE`必须转换成`/c/Users/...`形式。另外还需要环境变量MSYS_NO_PATHCONV=1**
     - 可以用`docker cp`来copy进出容器,这在有时候忘了做卷映射时可以救急.
-    - 有种情况不要用`-t`(`--tty`):当要用<<<"Here String"或<<EOF Here Document向容器输入命令时。
 
 ----
 
@@ -404,6 +423,7 @@ adb push /home/devuser/nodejs-6.5.0-arm/bin/node /data/local/tmp/
 adb push /home/devuser/nodejs-6.5.0-arm/lib /data/local/tmp/
 adb shell chmod -R 755 /data/local/tmp/node /data/local/tmp/lib 
 ```
+*NodeJS本身只需要/home/devuser/nodejs-6.5.0-arm/bin/node, lib那个是为了npm的*
 
 ### 运行NodeJS
 
@@ -672,7 +692,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     ```
     'host_os%': '<(OS)',
     ```
-    上下看看就会明白`OS`就是target OS,就是android了。这个`host_os`在这个文件其他地方都没有被用到。
+    上下看看,明白了`OS`就是target OS,就是android了。这个`host_os`在这个文件其他地方都没有被用到。
     
     而另一个它的使用者[deps/v8/build/standalone.gypi#L264](https://github.com/nodejs/node/blob/master/deps/v8/build/standalone.gypi#L264)
     ```
@@ -817,7 +837,7 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     当然,到底在那个配置文件里加这个选项,有得头痛的层层追寻配置,不想干了。还不如黑路子快,
     最终,把这一切集成到android-gcc-toolchain里,通过`--host gcc-lpthread`选项可以实现。
 
-- 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。
+- 2016/09/05: 支持ccache这个编译缓存工具了,重复编译时速度快了很多。选项`--ccache`,注意是两个c。2016/09/22:删除这个选项了，单纯靠USE_CCACHE=1环境变量来表达这个选项。
 
 - 2016/09/06: 编译android-mipsel版时,碰到bits/c++config.h找不到之类的错误。似乎以前碰到过查了一下搞好了,可又忘了。得做个memo。
 
@@ -851,3 +871,31 @@ NodeJS对Android支持度很弱,想要Android版的,那就得折腾。那时大�
     而<string>里也没有包含cstdio，反而包含了一堆拿什么狗屁bits目录。反正就不如lbc++里的清爽。
     只不过，据NDK里说libc++是还不稳定的库（居然！，某些case没通过，arm下有时崩溃），所以，还是想办法把gnustl里的
     <cstdio>和<string>给改一下。不过这东西那个该死的GPL3的，...
+
+- 2016/09/26: 可以看到每个编译命令的命令行。只要加个-v(--verbose)选项给这个工具，或者设定环境变量'export AGCC_VERBOSE=1'。例子：
+
+    ```
+    $___ ccache '/Users/q/Library/Android/sdk/ndk-bundle/std-toolchains/android-9-arm/bin/arm-linux-androideabi-c++' \
+    $___  '-D_GLIBCXX_USE_C99_MATH' \
+    $___  '-I../deps/gtest' \
+    $___  '-I../deps/gtest/include' \
+    $___  '-Wall' \
+    $___  '-Wextra' \
+    $___  '-Wno-unused-parameter' \
+    $___  '-Wno-missing-field-initializers' \
+    $___  '-O3' \
+    $___  '-fno-omit-frame-pointer' \
+    $___  '-fPIE' \
+    $___  '-fno-rtti' \
+    $___  '-fno-exceptions' \
+    $___  '-std=gnu++0x' \
+    $___  '-MMD' \
+    $___  '-MF' \
+    $___  '/Users/q/Downloads/node/out/Release/.deps//Users/q/Downloads/node/out/Release/obj.target/gtest/deps/gtest/src/gtest-filepath.o.d.raw' \
+    $___  '-c' \
+    $___  '-o' \
+    $___  '/Users/q/Downloads/node/out/Release/obj.target/gtest/deps/gtest/src/gtest-filepath.o' \
+    $___  '../deps/gtest/src/gtest-filepath.cc'
+    ```
+    这里的$\___纯粹为了grep筛选好用，另外反正$\___是空的,就算原封不动copy下来在贴到别的地方执行也不会出错。
+    

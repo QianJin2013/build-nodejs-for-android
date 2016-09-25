@@ -9,4 +9,4 @@ ENV PATH=$PATH:/home/devuser/build-nodejs-for-android
 
 RUN sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gcc g++ gcc-multilib g++-multilib ccache
 
-RUN git clone https://github.com/nodejs/node && build-nodejs-for-android-v 6.5.0 && build-nodejs-for-android-v 6.6.0
+RUN git clone https://github.com/nodejs/node && cd node && build-nodejs-for-android v6.5.0 >/dev/null && build-nodejs-for-android v6.6.0 >/dev/null
